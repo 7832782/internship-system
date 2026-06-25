@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业实习报告系统</title>
+    <script>
+        // 检查登录状态并跳转
+        async function checkAndRedirect() {
+            try {
+                const response = await fetch('/api/check-login');
+                const result = await response.json();
+                
+                if (result.isLoggedIn) {
+                    // 已登录，跳转到主页
+                    window.location.href = '/home.html';
+                } else {
+                    // 未登录，跳转到登录页
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                // 出错也跳转到登录页
+                window.location.href = '/login.html';
+            }
+        }
+        
+        checkAndRedirect();
+    </script>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 100px; color: #666;">
+        <p>正在跳转...</p>
+        <p>如果没有自动跳转，请<a href="/login.html">点击这里</a></p>
+    </div>
+</body>
+</html>

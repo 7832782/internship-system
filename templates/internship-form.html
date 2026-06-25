@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实习信息填写</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+        
+        .progress-step.active:not(:last-child)::after,
+        .progress-step.completed:not(:last-child)::after {
+            background: #667eea;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+        
+        .progress-step.active .step-number {
+            background: #667eea;
+            color: white;
+        }
+        
+        .progress-step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+        
+        .step-label {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+        }
+        
+        .progress-step.active .step-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .form-content {
+            padding: 40px;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .step-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group input:read-only,
+        .form-group input.readonly-field {
+            background: #f5f5f5 !important;
+            color: #666 !important;
+            cursor: not-allowed;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin: 24px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .form-section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* 地区选择器样式 */
+        .region-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .region-select {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .region-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .region-result {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1976d2;
+            display: none;
+        }
+
+        .region-result.show {
+            display: block;
+        }
+
+        /* 单选按钮组样式 */
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+        }
+
+        /* Tooltip 样式 */
+        .field-tooltip {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 5px;
+            cursor: help;
+            position: relative;
+        }
+
+        .field-tooltip .tooltip-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .field-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 350px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -175px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            line-height: 1.5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .field-tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .field-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-group label .required {
+            margin-left: 4px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .btn-group .left-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-group .right-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-prev {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-prev:hover {
+            background: #5a6268;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-next:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #218838;
+        }
+        
+        .btn-submit {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background: #c82333;
+        }
+
+        /* 字段闪烁高亮（作用于整个form-group） */
+        @keyframes flashHighlight {
+            0% { background-color: #fff5f5; box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            30% { background-color: #ffe0e0; box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.25); }
+            60% { background-color: #fff5f5; box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15); }
+            100% { background-color: transparent; box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        .form-group.field-flash {
+            animation: flashHighlight 1.2s ease-out;
+            border-radius: 8px;
+        }
+
+        /* 回到顶部按钮 */
+        .top-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .top-btn.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .top-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .top-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .top-btn .top-btn-text {
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .info-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            width: 100px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .error-msg {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .success-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 16px;
+            color: #333;
+        }
+        
+        .modal-content p {
+            color: #6c757d;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>实习信息填写</h1>
+            <p>请按步骤完成实习相关信息的填写</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="0">
+                <div class="step-number">1</div>
+                <div class="step-label">个人信息</div>
+            </div>
+            <div class="progress-step" data-step="1">
+                <div class="step-number">2</div>
+                <div class="step-label">实习信息</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-number">3</div>
+                <div class="step-label">实习登记</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="step-number">4</div>
+                <div class="step-label">实习报告</div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="step-number">5</div>
+                <div class="step-label">监管信息</div>
+            </div>
+        </div>
+        
+        <!-- 固定操作按钮栏 -->
+        <div class="btn-group" id="actionBar">
+            <div class="left-buttons">
+                <a href="home.html" class="btn btn-prev" id="btnBackHome">← 返回主页</a>
+                <button class="btn btn-prev" id="btnPrev" onclick="prevStep()" style="display:none">上一步</button>
+            </div>
+            <div class="right-buttons">
+                <button class="btn btn-next" id="btnNext" onclick="nextStep()">下一步</button>
+                <button class="btn btn-submit" id="btnSubmit" onclick="submitForm()" style="display:none">提交</button>
+            </div>
+        </div>
+        
+        <div class="form-content">
+            <!-- 第0步：个人信息（可编辑） -->
+            <div class="step-content active" id="step0">
+                <h2 class="step-title">个人信息</h2>
+                <div class="form-group">
+                    <label>学号</label>
+                    <input type="text" id="displayStudentId" class="readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>姓名 <span class="required">*</span></label>
+                    <input type="text" id="displayName" placeholder="请输入姓名" required>
+                    <div class="error-msg" id="displayNameError">请填写姓名</div>
+                </div>
+                <div class="form-group">
+                    <label>性别 <span class="required">*</span></label>
+                    <select id="displayGender" required>
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                    <div class="error-msg" id="displayGenderError">请选择性别</div>
+                </div>
+                <div class="form-group">
+                    <label>学院 <span class="required">*</span></label>
+                    <input type="text" id="displayCollege" placeholder="请输入学院" required>
+                    <div class="error-msg" id="displayCollegeError">请填写学院</div>
+                </div>
+                <div class="form-group">
+                    <label>专业 <span class="required">*</span></label>
+                    <input type="text" id="displayMajor" placeholder="请输入专业" required>
+                    <div class="error-msg" id="displayMajorError">请填写专业</div>
+                </div>
+                <div class="form-group">
+                    <label>班级序号 <span class="required">*</span></label>
+                    <select id="displayClassNumber" required>
+                        <option value="">请选择</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                    </select>
+                    <div class="error-msg" id="displayClassNumberError">请选择班级序号</div>
+                </div>
+            </div>
+            
+            <!-- 第1步：公共实习信息 -->
+            <div class="step-content" id="step1">
+                <h2 class="step-title">实习信息</h2>
+                <div class="form-group">
+                    <label>实习单位 <span class="required">*</span></label>
+                    <input type="text" id="company" placeholder="请输入实习单位名称">
+                    <div class="error-msg" id="companyError">请填写实习单位</div>
+                </div>
+                <div class="form-group">
+                    <label>指导教师 <span class="required">*</span></label>
+                    <input type="text" id="teacher" placeholder="请输入指导教师姓名">
+                    <div class="error-msg" id="teacherError">请填写指导教师</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>开始日期 <span class="required">*</span></label>
+                        <input type="date" id="startDate" onchange="validateAndCalculateDays()">
+                        <div class="error-msg" id="startDateError">请选择开始日期</div>
+                    </div>
+                    <div class="form-group">
+                        <label>结束日期 <span class="required">*</span></label>
+                        <input type="date" id="endDate" onchange="validateAndCalculateDays()">
+                        <div class="error-msg" id="endDateError">请选择结束日期</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>实习天数</label>
+                    <input type="text" id="totalDays" class="readonly-field" readonly placeholder="自动计算">
+                </div>
+            </div>
+            
+            <!-- 第2步：实习登记独有 -->
+            <div class="step-content" id="step2">
+                <h2 class="step-title">实习登记</h2>
+                <div style="color: #856404; font-size: 13px; margin: -8px 0 16px 0; padding: 6px 10px; background: #fff8e1; border-radius: 4px;">字数在600-800字之间</div>
+                <div class="form-group">
+                    <label>自我鉴定 <span class="required">*</span></label>
+                    <textarea id="selfEvaluation" rows="12" placeholder="包括个人思想政治、工作内容、工作表现、收获及存在问题等方面" required></textarea>
+                    <div class="error-msg" id="selfEvaluationError">请填写自我鉴定</div>
+                </div>
+            </div>
+            
+            <!-- 第3步：实习报告独有 -->
+            <div class="step-content" id="step3">
+                <h2 class="step-title">实习报告</h2>
+                <div style="color: #856404; font-size: 13px; margin: -8px 0 16px 0; padding: 6px 10px; background: #fff8e1; border-radius: 4px;">报告内容不少于2000字</div>
+                <div class="form-group">
+                    <label>实习内容 <span class="required">*</span></label>
+                    <textarea id="internshipContent" rows="6" placeholder="实习中所从事的具体工作" required></textarea>
+                    <div class="error-msg" id="internshipContentError">请填写实习内容</div>
+                </div>
+                <div class="form-group">
+                    <label>实习的体会和收获 <span class="required">*</span></label>
+                    <textarea id="experience" rows="8" placeholder="对所从事工作的认识、掌握程度、感想及收获等，需融入思想政治教育内容" required></textarea>
+                    <div class="error-msg" id="experienceError">请填写实习体会和收获</div>
+                </div>
+                <div class="form-group">
+                    <label>建议及其它 <span class="required">*</span></label>
+                    <textarea id="suggestions" rows="6" placeholder="通过实习，对本专业的专业知识、课程结构及实习的安排和管理等方面的建议和想法" required></textarea>
+                    <div class="error-msg" id="suggestionsError">请填写建议及其它</div>
+                </div>
+            </div>
+            
+            <!-- 第4步：监管信息独有 -->
+            <div class="step-content" id="step4">
+                <h2 class="step-title">监管信息</h2>
+
+                <!-- 基本信息（系统自动填充，只读） -->
+                <div class="form-section-title">基本信息（系统自动填充）</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>学号</label>
+                        <input type="text" id="studentId" class="readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>学生姓名</label>
+                        <input type="text" id="name" class="readonly-field" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>入学年份</label>
+                        <input type="text" id="enrollmentYear" class="readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>院系</label>
+                        <input type="text" id="college" class="readonly-field" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>班级</label>
+                    <input type="text" id="classNumber" class="readonly-field" readonly>
+                </div>
+
+                <!-- 课程信息（系统自动填充，只读） -->
+                <div class="form-section-title">课程信息（系统自动填充）</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>课程名称</label>
+                        <input type="text" id="courseName" class="readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>课程代码</label>
+                        <input type="text" id="courseCode" class="readonly-field" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>学分</label>
+                        <input type="text" id="credits" class="readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>实习类型</label>
+                        <input type="text" id="internshipType" class="readonly-field" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>实习组织形式</label>
+                        <input type="text" id="internshipOrgForm" class="readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>实习方式</label>
+                        <input type="text" id="internshipMethod" class="readonly-field" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>学年</label>
+                    <input type="text" id="academicYear" class="readonly-field" readonly>
+                </div>
+
+                <!-- 实习单位信息 -->
+                <div class="form-section-title">实习单位信息 <span class="required">*</span></div>
+                <div class="form-group">
+                    <label>指导教师</label>
+                    <input type="text" id="teacherDisplay" class="readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>
+                        实习单位名称 <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">准确填写具有法人资格的单位全称。如果在校内不具有法人资格的二级单位实习，填写学校名称。对于"田野写生""现场采访""野外考察""社会调查"等没有固定单位的实习，可填写实习内容名称</span></span>
+                    </label>
+                    <input type="text" id="companyDisplay" class="readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>
+                        实习单位统一社会信用代码 <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">在企事业单位（法人单位）实习的，准确填写"统一社会信用代码"；如无，填"无"</span></span>
+                    </label>
+                    <input type="text" id="companyCreditCode" placeholder="请输入统一社会信用代码，如无填'无'" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        实习地区及代码 <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">填写格式：地区名-地区标准码。例如，江苏省无锡市梁溪区-320213，地区名一般精确到县（区）级，地区标准码为6位地区标准代码</span></span>
+                    </label>
+                    <div class="region-selector">
+                        <select id="province-select" class="region-select" required>
+                            <option value="">请选择省/直辖市/自治区</option>
+                        </select>
+                        <select id="city-select" class="region-select" required>
+                            <option value="">请选择市</option>
+                        </select>
+                        <select id="county-select" class="region-select" required>
+                            <option value="">请选择区/县</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="internshipAreaCode" name="internshipAreaCode">
+                    <div class="region-result" id="regionResult"></div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        实习详细地址 <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">实习所在地点的通信地址，不超过200字</span></span>
+                    </label>
+                    <input type="text" id="internshipAddress" placeholder="请输入实习所在地点的通信地址，不超过200字" required>
+                    <div class="error-msg" id="internshipAddressError">请填写实习详细地址</div>
+                </div>
+
+                <!-- 实习保障信息 -->
+                <div class="form-section-title">实习保障信息 <span class="required">*</span></div>
+                <div class="form-group">
+                    <label>是否有实习责任险 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hasLiabilityInsurance" value="是" checked> 是</label>
+                        <label><input type="radio" name="hasLiabilityInsurance" value="否"> 否</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否有人身意外险 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hasAccidentInsurance" value="是" checked> 是</label>
+                        <label><input type="radio" name="hasAccidentInsurance" value="否"> 否</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否进行实习安全教育和培训 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hasSafetyTraining" value="是" checked> 是</label>
+                        <label><input type="radio" name="hasSafetyTraining" value="否"> 否</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否签订实习三方协议 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hasTripartiteAgreement" value="是" checked> 是</label>
+                        <label><input type="radio" name="hasTripartiteAgreement" value="否"> 否</label>
+                    </div>
+                </div>
+
+                <!-- 实习单位其他信息 -->
+                <div class="form-section-title">实习单位其他信息 <span class="required">*</span></div>
+                <div class="form-group">
+                    <label>实习单位获取方式 <span class="required">*</span></label>
+                    <select id="companyAcquisitionMethod" required>
+                        <option value="">请选择</option>
+                        <option value="学校组织联系">学校组织联系</option>
+                        <option value="学生自行联系">学生自行联系</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>实习单位是否有安全应急预案 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="hasEmergencyPlan" value="是" checked> 是</label>
+                        <label><input type="radio" name="hasEmergencyPlan" value="否"> 否</label>
+                    </div>
+                </div>
+
+                <!-- 实习基地信息（系统自动填充） -->
+                <div class="form-section-title">实习基地信息（系统自动填充）</div>
+                <div class="form-group">
+                    <label>实习单位是否为校级及以上实习基地</label>
+                    <input type="text" id="isSchoolBase" class="readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>实习单位是否为数智赋能实习基地</label>
+                    <input type="text" id="isDigitalBase" class="readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>实习单位是否为海外实习基地</label>
+                    <input type="text" id="isOverseasBase" class="readonly-field" readonly>
+                </div>
+
+                <!-- 实习时间信息 -->
+                <div class="form-section-title">实习时间信息 <span class="required">*</span></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>实习开始时间 <span class="required">*</span></label>
+                        <input type="date" id="startDateDisplay" class="readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>实习结束时间 <span class="required">*</span></label>
+                        <input type="date" id="endDateDisplay" class="readonly-field" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>实际实习天数</label>
+                    <input type="text" id="totalDaysDisplay" class="readonly-field" readonly>
+                </div>
+
+                <!-- 实习岗位信息 -->
+                <div class="form-section-title">实习岗位信息 <span class="required">*</span></div>
+                <div class="form-group">
+                    <label>
+                        实习岗位 <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">实习岗位名称</span></span>
+                    </label>
+                    <input type="text" id="internshipPosition" placeholder="请输入实习岗位名称" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        实习报酬（元/月） <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">月薪标准，单位为元。如为日薪可以以"日薪*22"来计算，如无报酬，可以填0</span></span>
+                    </label>
+                    <input type="number" id="internshipSalary" placeholder="请输入实习报酬，如无则填0" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        企业指导人员姓名 <span class="required">*</span>
+                        <span class="field-tooltip"><span class="tooltip-icon">?</span><span class="tooltip-text">企业派给的指导人员真实姓名，如无明确指导人员，可以填"无"</span></span>
+                    </label>
+                    <input type="text" id="companySupervisor" placeholder="请输入企业指导人员姓名，如无明确指导人员填"无"" required>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 回到顶部按钮 -->
+    <button class="top-btn" id="topBtn" onclick="scrollToTop()">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20.3964 12.83585C21.65635 14.0958 20.76405 16.2501 18.9822 16.2501L5.01774 16.2501C3.23594 16.2501 2.34359 14.0958 3.60353 12.83585L10.58575 5.85361C11.3668 5.07256 12.63315 5.07256 13.4142 5.85361L20.3964 12.83585z"/></svg>
+        <span class="top-btn-text">顶部</span>
+    </button>
+
+    <script src="/static/region-data-full.js"></script>
+
+    <!-- 成功弹窗 -->
+    <div class="success-modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h2>提交成功！</h2>
+            <p>您的实习信息已提交完成</p>
+            <button class="btn btn-next" onclick="goToHome()">返回主页</button>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 0;
+        let userInfo = {};
+        let csrfToken = '';
+
+        // 获取CSRF Token
+        async function fetchCsrfToken() {
+            try {
+                const response = await fetch('/api/csrf-token');
+                const result = await response.json();
+                csrfToken = result.csrf_token;
+            } catch (error) {
+                console.error('获取CSRF Token失败:', error);
+            }
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        // 检查批次截止时间
+        async function checkBatchDeadline() {
+            // 管理员不检查截止
+            if (userInfo && userInfo.role === 'admin') {
+                return true;
+            }
+            try {
+                const response = await fetch('/api/check-batch-deadline');
+                const data = await response.json();
+                if (!data.canSubmit) {
+                    showExpiredMessage(data.message);
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('检查批次截止失败:', error);
+                return true;
+            }
+        }
+
+        function showExpiredMessage(message) {
+            var msg = message || '您所在或关联的批次已截止提交，无法编辑实习信息。';
+            document.body.innerHTML = [
+                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f5f5f5;font-family:sans-serif;">',
+                '<div style="background:white;padding:40px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center;max-width:500px;">',
+                '<div style="font-size:48px;margin-bottom:20px;">⏰</div>',
+                '<h2 style="color:#333;margin-bottom:16px;">提交已截止</h2>',
+                '<p style="color:#666;margin-bottom:24px;line-height:1.6;">' + escapeHtml(msg) + '</p>',
+                '<p style="color:#999;font-size:14px;margin-bottom:24px;">如有疑问，请联系管理员。</p>',
+                '<a href="home.html" style="display:inline-block;padding:12px 32px;background:#1890ff;color:white;text-decoration:none;border-radius:6px;font-size:14px;">返回主页</a>',
+                '</div></div>'
+            ].join('');
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            await fetchCsrfToken();
+
+            // 先检查批次截止
+            const canSubmit = await checkBatchDeadline();
+            if (!canSubmit) {
+                return; // 已截止，停止加载
+            }
+
+            await loadUserInfo();
+            // 先尝试从数据库加载已提交的数据，如果没有则加载本地草稿
+            const hasDbData = await loadSubmittedData();
+            if (!hasDbData) {
+                loadDraft();
+            }
+            // 最后用系统配置覆盖（防止被已保存数据中的旧值覆盖）
+            await loadSettings();
+
+            // 初始化按钮栏状态
+            updateActionBar();
+
+            // 滚动监听：显示/隐藏回到顶部按钮
+            const topBtn = document.getElementById('topBtn');
+            let ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(function() {
+                        if (window.pageYOffset > 300) {
+                            topBtn.classList.add('visible');
+                        } else {
+                            topBtn.classList.remove('visible');
+                        }
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+        });
+        
+        // 加载用户信息
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/check-login');
+                const result = await response.json();
+                
+                if (!result.isLoggedIn) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                userInfo = result.user;
+                const u = result.user || {};
+                // 填充第0步个人信息表单
+                document.getElementById('displayStudentId').value = u.studentId || '';
+                document.getElementById('displayName').value = u.name || '';
+                document.getElementById('displayGender').value = u.gender || '';
+                document.getElementById('displayCollege').value = u.college || '';
+                document.getElementById('displayMajor').value = u.major || '';
+                document.getElementById('displayClassNumber').value = u.classNumber || '';
+
+                // 填充监管信息页面的只读字段
+                document.getElementById('studentId').value = u.studentId || '';
+                document.getElementById('name').value = u.name || '';
+                document.getElementById('college').value = u.college || '';
+                // 从学号提取入学年份（如2022010203 -> 2022）
+                if (u.studentId && u.studentId.length >= 4) {
+                    document.getElementById('enrollmentYear').value = u.studentId.substring(0, 4);
+                }
+                // 班级可以从个人信息获取，如果没有则留空
+                document.getElementById('classNumber').value = u.classNumber || '';
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+            }
+        }
+
+        // 加载系统配置默认值
+        function loadSettings() {
+            var defaults = {
+                courseName: '专业实习', courseCode: 'CSE450', credits: '4（4）',
+                internshipType: '专业实习', internshipOrgForm: '集中实习', internshipMethod: '现场实习',
+                academicYear: '2024-2025学年', isSchoolBase: '否', isDigitalBase: '否', isOverseasBase: '否'
+            };
+            // 先尝试从服务器获取最新配置
+            fetch('/api/settings', { headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken } })
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(settings) {
+                    if (settings) {
+                        Object.keys(settings).forEach(function(key) {
+                            var el = document.getElementById(key);
+                            if (el) el.value = settings[key];
+                        });
+                        return;
+                    }
+                    // 失败则用硬编码默认值
+                    applyDefaults();
+                })
+                .catch(function() { applyDefaults(); });
+            function applyDefaults() {
+                Object.keys(defaults).forEach(function(key) {
+                    var el = document.getElementById(key);
+                    if (el) el.value = defaults[key];
+                });
+            }
+        }
+        
+        // API 字段名 → HTML 元素 ID 映射（snake_case → camelCase）
+        var apiFieldToId = {
+            start_date: 'startDate', end_date: 'endDate', total_days: 'totalDays',
+            internship_content: 'internshipContent', self_evaluation: 'selfEvaluation',
+            internship_position: 'internshipPosition', internship_salary: 'internshipSalary',
+            company_supervisor: 'companySupervisor', enrollment_year: 'enrollmentYear',
+            course_name: 'courseName', course_code: 'courseCode',
+            internship_type: 'internshipType', internship_org_form: 'internshipOrgForm',
+            internship_method: 'internshipMethod', academic_year: 'academicYear',
+            company_credit_code: 'companyCreditCode', internship_area_code: 'internshipAreaCode',
+            internship_address: 'internshipAddress', has_liability_insurance: 'hasLiabilityInsurance',
+            has_accident_insurance: 'hasAccidentInsurance', has_safety_training: 'hasSafetyTraining',
+            has_tripartite_agreement: 'hasTripartiteAgreement', company_acquisition_method: 'companyAcquisitionMethod',
+            has_emergency_plan: 'hasEmergencyPlan', is_school_base: 'isSchoolBase',
+            is_digital_base: 'isDigitalBase', is_overseas_base: 'isOverseasBase',
+            class_number: 'classNumber',
+        };
+
+        // 反转：HTML 元素 ID → API 字段名
+        var idToApiField = {};
+        for (var k in apiFieldToId) {
+            if (apiFieldToId.hasOwnProperty(k)) {
+                idToApiField[apiFieldToId[k]] = k;
+            }
+        }
+
+        // 将 API 响应中的 snake_case 转为 camelCase（用于 DOM 查找）
+        function apiToFormData(apiData) {
+            var result = {};
+            for (var key in apiData) {
+                if (apiData.hasOwnProperty(key)) {
+                    var id = apiFieldToId[key] || key;
+                    result[id] = apiData[key];
+                }
+            }
+            return result;
+        }
+
+        // 将从表单收集的数据转为 snake_case（用于 API 提交）
+        function formToApiData(formData) {
+            var result = {};
+            for (var key in formData) {
+                if (formData.hasOwnProperty(key)) {
+                    var apiKey = idToApiField[key] || key;
+                    result[apiKey] = formData[key];
+                }
+            }
+            return result;
+        }
+
+        // 从数据库加载已提交的数据
+        async function loadSubmittedData() {
+            try {
+                var hasData = false;
+                var endpoints = [
+                    { url: '/api/internship', name: 'internship' },
+                    { url: '/api/registration', name: 'registration' },
+                    { url: '/api/supervision', name: 'supervision' }
+                ];
+
+                for (var i = 0; i < endpoints.length; i++) {
+                    try {
+                        var res = await fetch(endpoints[i].url);
+                        if (res.ok) {
+                            var data = await res.json();
+                            if (data && data.exists !== false && data.student === undefined) {
+                                // 有关系数据则跳过
+                            }
+                            if (data && data.exists === false) continue;
+                            // 有数据：转换字段名并填充
+                            fillFormWithData(apiToFormData(data));
+                            hasData = true;
+                        }
+                    } catch (e) {
+                        console.error('加载' + endpoints[i].name + '数据失败:', e);
+                    }
+                }
+
+                return hasData;
+            } catch (error) {
+                console.error('加载已提交数据失败:', error);
+                return false;
+            }
+        }
+
+        // 用数据填充表单
+        function fillFormWithData(data) {
+            // 填充普通输入字段
+            for (var key in data) {
+                if (data.hasOwnProperty(key) && data[key] !== undefined && data[key] !== null) {
+                    var element = document.getElementById(key);
+                    if (!element) continue;
+                    // 跳过只读的系统字段（这些由用户信息填充）
+                    var skipFields = ['studentId', 'name', 'college', 'enrollmentYear', 'classNumber',
+                                      'courseName', 'courseCode', 'credits', 'internshipType',
+                                      'internshipOrgForm', 'internshipMethod', 'academicYear',
+                                      'isSchoolBase', 'isDigitalBase', 'isOverseasBase',
+                                      'teacherDisplay', 'companyDisplay', 'startDateDisplay',
+                                      'endDateDisplay', 'totalDaysDisplay'];
+                    if (element.classList.contains('readonly-field') && skipFields.indexOf(key) !== -1) {
+                        continue;
+                    }
+                    element.value = data[key];
+                }
+            }
+
+            // 处理单选按钮
+            var radioFields = ['hasLiabilityInsurance', 'hasAccidentInsurance', 'hasSafetyTraining',
+                               'hasTripartiteAgreement', 'hasEmergencyPlan'];
+            for (var r = 0; r < radioFields.length; r++) {
+                var rf = radioFields[r];
+                if (data[rf]) {
+                    var radio = document.querySelector('input[name="' + rf + '"][value="' + data[rf] + '"]');
+                    if (radio) radio.checked = true;
+                }
+            }
+
+            // 同步公共字段到监管信息页面
+            var syncMap = { company: 'companyDisplay', teacher: 'teacherDisplay',
+                            startDate: 'startDateDisplay', endDate: 'endDateDisplay',
+                            totalDays: 'totalDaysDisplay' };
+            for (var from in syncMap) {
+                if (syncMap.hasOwnProperty(from) && data[from]) {
+                    var toEl = document.getElementById(syncMap[from]);
+                    if (toEl) toEl.value = data[from];
+                }
+            }
+        }
+
+        // 加载本地草稿
+        function loadDraft() {
+            const draft = localStorage.getItem('internshipFormDraft');
+            if (draft) {
+                const data = JSON.parse(draft);
+                // 跳过属于其他用户的草稿
+                if (data._savedBy && userInfo && userInfo.studentId && data._savedBy !== userInfo.studentId) {
+                    localStorage.removeItem('internshipFormDraft');
+                    return;
+                }
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = data[key];
+                    }
+                    // 处理单选按钮
+                    if (key.startsWith('has') && data[key]) {
+                        const radio = document.querySelector('input[name="' + key + '"][value="' + data[key] + '"]');
+                        if (radio) {
+                            radio.checked = true;
+                        }
+                    }
+                });
+            }
+        }
+
+        // 保存草稿
+        function saveDraft() {
+            const data = {};
+            // 记录保存草稿的用户，防止跨用户加载
+            if (userInfo && userInfo.studentId) {
+                data._savedBy = userInfo.studentId;
+            }
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.id) {
+                    data[input.id] = input.value;
+                }
+            });
+            // 保存单选按钮的值
+            data['hasLiabilityInsurance'] = document.querySelector('input[name="hasLiabilityInsurance"]:checked')?.value || '是';
+            data['hasAccidentInsurance'] = document.querySelector('input[name="hasAccidentInsurance"]:checked')?.value || '是';
+            data['hasSafetyTraining'] = document.querySelector('input[name="hasSafetyTraining"]:checked')?.value || '是';
+            data['hasTripartiteAgreement'] = document.querySelector('input[name="hasTripartiteAgreement"]:checked')?.value || '是';
+            data['hasEmergencyPlan'] = document.querySelector('input[name="hasEmergencyPlan"]:checked')?.value || '是';
+            localStorage.setItem('internshipFormDraft', JSON.stringify(data));
+        }
+
+        // 同步公共字段到监管信息页面
+        function syncCommonFields() {
+            // 同步指导教师
+            const teacher = document.getElementById('teacher').value;
+            document.getElementById('teacherDisplay').value = teacher;
+
+            // 同步实习单位
+            const company = document.getElementById('company').value;
+            document.getElementById('companyDisplay').value = company;
+
+            // 同步日期
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const totalDays = document.getElementById('totalDays').value;
+            document.getElementById('startDateDisplay').value = startDate;
+            document.getElementById('endDateDisplay').value = endDate;
+            document.getElementById('totalDaysDisplay').value = totalDays;
+        }
+
+        // 验证日期并自动计算天数
+        function validateAndCalculateDays() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const totalDaysInput = document.getElementById('totalDays');
+
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
+                // 实时阻拦：开始日期不能晚于结束日期
+                if (start > end) {
+                    alert('实习开始日期不能晚于结束日期！');
+                    endDateInput.value = '';
+                    totalDaysInput.value = '';
+                    return false;
+                }
+
+                // 自动计算天数
+                const diffTime = end - start;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                totalDaysInput.value = diffDays + '天';
+            }
+            return true;
+        }
+        
+        // 初始化地区选择器
+        function initRegionSelector() {
+            if (typeof regionData === 'undefined') {
+                console.error('地区数据未加载');
+                return;
+            }
+
+            const provinceSelect = document.getElementById('province-select');
+            const citySelect = document.getElementById('city-select');
+            const countySelect = document.getElementById('county-select');
+            const areaCodeInput = document.getElementById('internshipAreaCode');
+            const regionResult = document.getElementById('regionResult');
+
+            // 保存已有的地区代码值（编辑已有数据时恢复用）
+            const existingAreaCode = areaCodeInput.value;
+
+            let currentProvince = null;
+            let currentCity = null;
+
+            // 获取编码后缀
+            function getSuffix(code, level) {
+                if (!code) return '';
+                if (level === 'province') return code.substring(0, 2);
+                if (level === 'city') return code.substring(2, 4);
+                if (level === 'county') return code.substring(4, 6);
+                return '';
+            }
+
+            // 填充省份
+            regionData.forEach(province => {
+                const option = document.createElement('option');
+                option.value = province.code;
+                option.textContent = province.name + '-' + getSuffix(province.code, 'province');
+                option.dataset.code = province.code;
+                provinceSelect.appendChild(option);
+            });
+
+            // 特殊地区编码（台湾、香港、澳门、国外）
+            const specialRegions = ['710000', '810000', '820000', '990000'];
+
+            // 省份改变时填充城市
+            provinceSelect.addEventListener('change', function() {
+                const provinceCode = this.value;
+                currentProvince = regionData.find(p => p.code === provinceCode);
+
+                citySelect.innerHTML = '<option value="">请选择市</option>';
+                countySelect.innerHTML = '<option value="">请选择区/县</option>';
+                areaCodeInput.value = '';
+                regionResult.classList.remove('show');
+
+                if (!currentProvince) return;
+
+                // 特殊地区处理（台湾、香港、澳门、国外）
+                if (specialRegions.includes(provinceCode)) {
+                    citySelect.style.display = 'none';
+                    countySelect.style.display = 'none';
+                    citySelect.removeAttribute('required');
+                    countySelect.removeAttribute('required');
+                    const regionName = currentProvince.name;
+                    const regionCode = currentProvince.code;
+                    areaCodeInput.value = regionName + '-' + regionCode;
+                    regionResult.textContent = '已选择：' + regionName + ' (' + regionCode + ')';
+                    regionResult.classList.add('show');
+                    return;
+                }
+
+                // 恢复显示市、县选择器
+                citySelect.style.display = 'inline-block';
+                countySelect.style.display = 'inline-block';
+                citySelect.setAttribute('required', '');
+                countySelect.setAttribute('required', '');
+
+                if (currentProvince.isMunicipality) {
+                    // 直辖市：市选择器显示区
+                    citySelect.innerHTML = '<option value="">请选择区</option>';
+                    currentProvince.districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.code;
+                        option.textContent = district.name + '-' + getSuffix(district.code, 'county');
+                        option.dataset.code = district.code;
+                        citySelect.appendChild(option);
+                    });
+                    countySelect.style.display = 'none';
+                    countySelect.removeAttribute('required');
+                } else {
+                    // 普通省份：市选择器显示市
+                    countySelect.style.display = 'inline-block';
+                    countySelect.setAttribute('required', '');
+                    citySelect.setAttribute('required', '');
+                    currentProvince.cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.code;
+                        option.textContent = city.name + '-' + getSuffix(city.code, 'city');
+                        option.dataset.code = city.code;
+                        citySelect.appendChild(option);
+                    });
+                }
+            });
+
+            // 城市改变时填充区县或设置值
+            citySelect.addEventListener('change', function() {
+                const cityCode = this.value;
+                countySelect.innerHTML = '<option value="">请选择区/县</option>';
+                areaCodeInput.value = '';
+                regionResult.classList.remove('show');
+
+                if (!cityCode || !currentProvince) return;
+
+                if (currentProvince.isMunicipality) {
+                    // 直辖市：直接设置区
+                    const district = currentProvince.districts.find(d => d.code === cityCode);
+                    if (district) {
+                        const regionName = currentProvince.name + district.name;
+                        const regionCode = district.code;
+                        areaCodeInput.value = regionName + '-' + regionCode;
+                        regionResult.textContent = '已选择：' + regionName + ' (' + regionCode + ')';
+                        regionResult.classList.add('show');
+                    }
+                } else {
+                    // 普通省份：查找城市
+                    currentCity = currentProvince.cities.find(c => c.code === cityCode);
+                    if (!currentCity) return;
+
+                    if (currentCity.counties && currentCity.counties.length > 0) {
+                        // 有区县：填充区县下拉框，设为必选
+                        countySelect.style.display = 'inline-block';
+                        countySelect.setAttribute('required', '');
+                        currentCity.counties.forEach(county => {
+                            const option = document.createElement('option');
+                            option.value = county.code;
+                            option.textContent = county.name + '-' + getSuffix(county.code, 'county');
+                            option.dataset.code = county.code;
+                            countySelect.appendChild(option);
+                        });
+                    } else {
+                        // 无区县（如东莞、中山）：直接用城市代码补00
+                        countySelect.style.display = 'none';
+                        countySelect.removeAttribute('required');
+                        const regionName = currentProvince.name + currentCity.name;
+                        const regionCode = currentCity.code;
+                        areaCodeInput.value = regionName + '-' + regionCode;
+                        regionResult.textContent = '已选择：' + regionName + ' (' + regionCode + ')';
+                        regionResult.classList.add('show');
+                    }
+                }
+            });
+
+            // 区县改变时更新地区代码
+            countySelect.addEventListener('change', function() {
+                const countyCode = this.value;
+                areaCodeInput.value = '';
+                regionResult.classList.remove('show');
+
+                if (!countyCode || !currentProvince || !currentCity) return;
+
+                const county = currentCity.counties.find(c => c.code === countyCode);
+                if (county) {
+                    const regionName = currentProvince.name + currentCity.name + county.name;
+                    const regionCode = county.code;
+                    areaCodeInput.value = regionName + '-' + regionCode;
+                    regionResult.textContent = '已选择：' + regionName + ' (' + regionCode + ')';
+                    regionResult.classList.add('show');
+                }
+            });
+
+            // 如果有已保存的地区代码，恢复选择状态
+            if (existingAreaCode) {
+                restoreRegionSelection(existingAreaCode);
+            }
+        }
+
+        // 根据已有地区代码恢复下拉选择状态
+        function restoreRegionSelection(areaCodeValue) {
+            // 格式: "河北省 邢台市 临城县-130522" 或 "广东省 东莞市-441900"
+            const parts = areaCodeValue.split('-');
+            if (parts.length < 2) return;
+            const code = parts[parts.length - 1];
+            if (!code || code.length < 6) return;
+
+            const provinceSelect = document.getElementById('province-select');
+            const citySelect = document.getElementById('city-select');
+            const countySelect = document.getElementById('county-select');
+
+            // 解析各级编码
+            const provinceCode = code.substring(0, 2) + '0000';
+            
+            // 设置省份
+            if (provinceSelect.querySelector(`option[value="${provinceCode}"]`)) {
+                provinceSelect.value = provinceCode;
+                provinceSelect.dispatchEvent(new Event('change'));
+
+                // 特殊地区（台湾、香港、澳门、国外）只有省，无需继续
+                const specialRegions = ['710000', '810000', '820000', '990000'];
+                if (specialRegions.includes(provinceCode)) return;
+
+                const cityCode = code.substring(0, 4) + '00';
+                
+                // 设置城市（或直辖市的区）
+                if (citySelect.querySelector(`option[value="${cityCode}"]`)) {
+                    citySelect.value = cityCode;
+                    citySelect.dispatchEvent(new Event('change'));
+
+                    // 如果有区县选择器可见且包含该代码，设置区县
+                    if (countySelect.style.display !== 'none' && 
+                        countySelect.querySelector(`option[value="${code}"]`)) {
+                        countySelect.value = code;
+                        countySelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            }
+        }
+
+        // 更新按钮栏状态
+        function updateActionBar() {
+            const btnBackHome = document.getElementById('btnBackHome');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            if (currentStep === 0) {
+                // 第一步：返回主页 + 下一步
+                btnBackHome.style.display = 'inline-block';
+                btnPrev.style.display = 'none';
+                btnNext.style.display = 'inline-block';
+                btnSubmit.style.display = 'none';
+            } else if (currentStep === 4) {
+                // 最后一步：上一步 + 提交
+                btnBackHome.style.display = 'none';
+                btnPrev.style.display = 'inline-block';
+                btnNext.style.display = 'none';
+                btnSubmit.style.display = 'inline-block';
+            } else {
+                // 中间步骤：上一步 + 下一步
+                btnBackHome.style.display = 'none';
+                btnPrev.style.display = 'inline-block';
+                btnNext.style.display = 'inline-block';
+                btnSubmit.style.display = 'none';
+            }
+        }
+
+        // 回到顶部（平滑动画）
+        function scrollToTop() {
+            const startY = window.pageYOffset || document.documentElement.scrollTop;
+            const duration = 400;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // easeOutCubic 缓动
+                const ease = 1 - Math.pow(1 - progress, 3);
+                window.scrollTo(0, startY * (1 - ease));
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        // 下一页（原nextStep）
+        function nextStep() {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+
+            saveDraft();
+
+            // 如果从第1步（实习信息）到第2步，同步公共字段
+            if (currentStep === 1) {
+                syncCommonFields();
+            }
+
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('completed');
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+
+            currentStep++;
+
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // 如果进入第4步（监管信息），初始化地区选择器
+            if (currentStep === 4) {
+                initRegionSelector();
+            }
+
+            updateActionBar();
+        }
+        
+        // 上一步
+        function prevStep() {
+            saveDraft();
+            
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            currentStep--;
+            
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('completed');
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            updateActionBar();
+        }
+        
+        // 平滑滚动到元素所在的form-group并闪烁高亮
+        function scrollToAndFlash(element) {
+            // 找到最近的 .form-group 父元素
+            const group = element.closest('.form-group') || element;
+            // 先移除已有的闪烁类
+            group.classList.remove('field-flash');
+            // 触发回流以重启动画
+            void group.offsetWidth;
+            group.classList.add('field-flash');
+            // 1.5秒后移除闪烁
+            setTimeout(() => {
+                group.classList.remove('field-flash');
+                group.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.style.borderColor = '';
+                });
+            }, 1500);
+
+            // 计算目标位置（考虑 sticky 按钮栏的高度）
+            const rect = group.getBoundingClientRect();
+            const stickyBar = document.getElementById('actionBar');
+            const offset = stickyBar ? stickyBar.offsetHeight + 16 : 80;
+            const targetY = window.pageYOffset + rect.top - offset;
+            
+            // 平滑滚动
+            const startY = window.pageYOffset;
+            const distance = targetY - startY;
+            const duration = 500;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                window.scrollTo(0, startY + distance * ease);
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+        
+        // 验证当前步骤
+        function validateStep(step) {
+            let isValid = true;
+
+            if (step === 0) {
+                // 验证个人信息（从上到下顺序检查）
+                const fields = [
+                    { id: 'displayName', error: 'displayNameError' },
+                    { id: 'displayGender', error: 'displayGenderError' },
+                    { id: 'displayCollege', error: 'displayCollegeError' },
+                    { id: 'displayMajor', error: 'displayMajorError' },
+                    { id: 'displayClassNumber', error: 'displayClassNumberError' }
+                ];
+                for (let i = 0; i < fields.length; i++) {
+                    const element = document.getElementById(fields[i].id);
+                    const errorElement = document.getElementById(fields[i].error);
+                    if (!element.value.trim()) {
+                        errorElement.style.display = 'block';
+                        scrollToAndFlash(element);
+                        isValid = false;
+                        break;
+                    } else {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            } else if (step === 1) {
+                // 验证实习信息（从上到下顺序检查）
+                const fields = [
+                    { id: 'company', error: 'companyError' },
+                    { id: 'teacher', error: 'teacherError' },
+                    { id: 'startDate', error: 'startDateError' },
+                    { id: 'endDate', error: 'endDateError' }
+                ];
+                for (let i = 0; i < fields.length; i++) {
+                    const element = document.getElementById(fields[i].id);
+                    const errorElement = document.getElementById(fields[i].error);
+                    if (!element.value.trim()) {
+                        errorElement.style.display = 'block';
+                        scrollToAndFlash(element);
+                        isValid = false;
+                        break;
+                    } else {
+                        errorElement.style.display = 'none';
+                    }
+                }
+
+                // 验证实习天数（只读字段，自动计算）
+                if (isValid) {
+                    const totalDays = document.getElementById('totalDays').value;
+                    if (!totalDays) {
+                        scrollToAndFlash(document.getElementById('startDate'));
+                        isValid = false;
+                    }
+                }
+
+                // 验证日期逻辑
+                if (isValid) {
+                    const startDate = new Date(document.getElementById('startDate').value);
+                    const endDate = new Date(document.getElementById('endDate').value);
+                    if (startDate > endDate) {
+                        scrollToAndFlash(document.getElementById('endDate'));
+                        isValid = false;
+                    }
+                }
+            } else if (step === 2) {
+                // 验证实习登记
+                const element = document.getElementById('selfEvaluation');
+                if (!element.value.trim()) {
+                    document.getElementById('selfEvaluationError').style.display = 'block';
+                    scrollToAndFlash(element);
+                    isValid = false;
+                } else {
+                    document.getElementById('selfEvaluationError').style.display = 'none';
+                }
+            } else if (step === 3) {
+                // 验证实习报告（从上到下顺序检查）
+                const fields = [
+                    { id: 'internshipContent', error: 'internshipContentError' },
+                    { id: 'experience', error: 'experienceError' },
+                    { id: 'suggestions', error: 'suggestionsError' }
+                ];
+                for (let i = 0; i < fields.length; i++) {
+                    const element = document.getElementById(fields[i].id);
+                    const errorElement = document.getElementById(fields[i].error);
+                    if (!element.value.trim()) {
+                        errorElement.style.display = 'block';
+                        scrollToAndFlash(element);
+                        isValid = false;
+                        break;
+                    } else {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            } else if (step === 4) {
+                 // 验证监管信息（从上到下顺序检查，一有未填就停止）
+                 const fields = [
+                     { id: 'companyCreditCode', error: null },
+                     { id: 'internshipAreaCode', error: null, flashParent: true },
+                     { id: 'internshipAddress', error: 'internshipAddressError' },
+                     { id: 'companyAcquisitionMethod', error: null },
+                     { id: 'internshipPosition', error: null },
+                     { id: 'internshipSalary', error: null },
+                     { id: 'companySupervisor', error: null }
+                 ];
+                 for (let i = 0; i < fields.length; i++) {
+                     const element = document.getElementById(fields[i].id);
+                     if (!element.value.trim()) {
+                         // 如果有错误提示元素则显示
+                         if (fields[i].error) {
+                             document.getElementById(fields[i].error).style.display = 'block';
+                         }
+                         // hidden 字段闪烁其父级可见元素
+                         if (fields[i].flashParent) {
+                             scrollToAndFlash(document.getElementById('province-select'));
+                         } else {
+                             scrollToAndFlash(element);
+                         }
+                         isValid = false;
+                         break;
+                     } else {
+                         if (fields[i].error) {
+                             document.getElementById(fields[i].error).style.display = 'none';
+                         }
+                     }
+                 }
+             }
+            
+            return isValid;
+        }
+        
+        // 提交表单
+        async function submitForm() {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+
+            // 提取天数数字
+            var totalDaysText = document.getElementById('totalDays').value;
+            var totalDays = parseInt(totalDaysText.replace(/[^0-9]/g, '')) || 0;
+
+            var formData = {
+                name: document.getElementById('displayName').value,
+                gender: document.getElementById('displayGender').value,
+                college: document.getElementById('displayCollege').value,
+                major: document.getElementById('displayMajor').value,
+                classNumber: document.getElementById('displayClassNumber').value,
+                company: document.getElementById('company').value,
+                teacher: document.getElementById('teacher').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                totalDays: totalDays,
+                selfEvaluation: document.getElementById('selfEvaluation').value,
+                internshipContent: document.getElementById('internshipContent').value,
+                experience: document.getElementById('experience').value,
+                suggestions: document.getElementById('suggestions').value,
+                enrollmentYear: document.getElementById('enrollmentYear').value,
+                courseName: document.getElementById('courseName').value,
+                courseCode: document.getElementById('courseCode').value,
+                credits: document.getElementById('credits').value,
+                internshipType: document.getElementById('internshipType').value,
+                internshipOrgForm: document.getElementById('internshipOrgForm').value,
+                internshipMethod: document.getElementById('internshipMethod').value,
+                companyCreditCode: document.getElementById('companyCreditCode').value,
+                internshipAreaCode: document.getElementById('internshipAreaCode').value,
+                internshipAddress: document.getElementById('internshipAddress').value,
+                internshipPosition: document.getElementById('internshipPosition').value,
+                internshipSalary: document.getElementById('internshipSalary').value,
+                companySupervisor: document.getElementById('companySupervisor').value,
+                academicYear: document.getElementById('academicYear').value,
+                hasLiabilityInsurance: document.querySelector('input[name="hasLiabilityInsurance"]:checked')?.value || '是',
+                hasAccidentInsurance: document.querySelector('input[name="hasAccidentInsurance"]:checked')?.value || '是',
+                hasSafetyTraining: document.querySelector('input[name="hasSafetyTraining"]:checked')?.value || '是',
+                hasTripartiteAgreement: document.querySelector('input[name="hasTripartiteAgreement"]:checked')?.value || '是',
+                companyAcquisitionMethod: document.getElementById('companyAcquisitionMethod').value,
+                hasEmergencyPlan: document.querySelector('input[name="hasEmergencyPlan"]:checked')?.value || '是',
+                isSchoolBase: document.getElementById('isSchoolBase').value,
+                isDigitalBase: document.getElementById('isDigitalBase').value,
+                isOverseasBase: document.getElementById('isOverseasBase').value
+            };
+
+            // 转为 snake_case 用于 API
+            var apiData = formToApiData(formData);
+
+            // 拆分为三个子集
+            var internshipData = {};
+            var internshipKeys = ['name', 'college', 'major', 'teacher', 'company', 'start_date', 'end_date', 'total_days', 'internship_content', 'experience', 'suggestions'];
+            for (var i = 0; i < internshipKeys.length; i++) {
+                if (apiData[internshipKeys[i]] !== undefined) {
+                    internshipData[internshipKeys[i]] = apiData[internshipKeys[i]];
+                }
+            }
+
+            var registrationData = {};
+            var registrationKeys = ['name', 'gender', 'college', 'major', 'company', 'start_date', 'end_date', 'total_days', 'self_evaluation'];
+            for (var j = 0; j < registrationKeys.length; j++) {
+                if (apiData[registrationKeys[j]] !== undefined) {
+                    registrationData[registrationKeys[j]] = apiData[registrationKeys[j]];
+                }
+            }
+
+            var supervisionData = {};
+            var supervisionKeys = ['name', 'enrollment_year', 'college', 'class_number',
+                'course_name', 'course_code', 'credits', 'internship_type', 'internship_org_form',
+                'internship_method', 'academic_year', 'is_school_base', 'is_digital_base', 'is_overseas_base',
+                'company', 'company_credit_code', 'internship_area_code', 'internship_address',
+                'has_liability_insurance', 'has_accident_insurance', 'has_safety_training',
+                'has_tripartite_agreement', 'company_acquisition_method', 'has_emergency_plan',
+                'start_date', 'end_date', 'total_days', 'internship_position', 'internship_salary',
+                'company_supervisor', 'teacher'];
+            for (var k = 0; k < supervisionKeys.length; k++) {
+                if (apiData[supervisionKeys[k]] !== undefined) {
+                    supervisionData[supervisionKeys[k]] = apiData[supervisionKeys[k]];
+                }
+            }
+
+            var headers = {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            };
+
+            try {
+                // 1. 更新个人资料
+                await fetch('/api/user/profile', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(formToApiData({
+                        name: formData.name,
+                        gender: formData.gender,
+                        college: formData.college,
+                        major: formData.major,
+                        classNumber: formData.classNumber
+                    }))
+                });
+
+                // 2. 提交实习报告（POST 或 PUT）
+                var internCheck = await fetch('/api/internship');
+                var internExists = false;
+                if (internCheck.ok) {
+                    var internData = await internCheck.json();
+                    internExists = (internData.exists !== false);
+                }
+                var internUrl = '/api/internship';
+                var internMethod = internExists ? 'PUT' : 'POST';
+                await fetch(internUrl, {
+                    method: internMethod,
+                    headers: headers,
+                    body: JSON.stringify(internshipData)
+                });
+
+                // 3. 提交实习登记（POST 或 PUT）
+                var regCheck = await fetch('/api/registration');
+                var regExists = false;
+                if (regCheck.ok) {
+                    var regData = await regCheck.json();
+                    regExists = (regData.exists !== false);
+                }
+                var regUrl = '/api/registration';
+                var regMethod = regExists ? 'PUT' : 'POST';
+                await fetch(regUrl, {
+                    method: regMethod,
+                    headers: headers,
+                    body: JSON.stringify(registrationData)
+                });
+
+                // 4. 提交监管信息（POST 或 PUT）
+                var supCheck = await fetch('/api/supervision');
+                var supExists = false;
+                if (supCheck.ok) {
+                    var supData = await supCheck.json();
+                    supExists = (supData.exists !== false);
+                }
+                var supUrl = '/api/supervision';
+                var supMethod = supExists ? 'PUT' : 'POST';
+                await fetch(supUrl, {
+                    method: supMethod,
+                    headers: headers,
+                    body: JSON.stringify(supervisionData)
+                });
+
+                localStorage.removeItem('internshipFormDraft');
+                document.getElementById('successModal').classList.add('active');
+
+            } catch (error) {
+                console.error('提交失败:', error);
+                alert('提交失败，请检查网络连接');
+            }
+        }
+        
+        // 返回主页
+        function goToHome() {
+            window.location.href = '/home.html';
+        }
+    </script>
+</body>
+</html>

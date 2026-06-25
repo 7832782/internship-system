@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业实习系统 - 管理后台</title>
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .page-title {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .required-star { color: red; }
+        .btn-add {
+            background: #28a745;
+            color: white;
+        }
+        .btn-export {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-reset {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-group {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: #667eea;
+        }
+        .page-size-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #666;
+            margin-left: 15px;
+        }
+        .page-size-control input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .page-size-control input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+            color: white;
+            border-color: #667eea;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pagination .page-info {
+            color: #666;
+            font-size: 14px;
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: white;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .btn-save {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            width: 100%;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+            font-size: 14px;
+        }
+        .advanced-search {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .search-row:last-child {
+            margin-bottom: 0;
+        }
+        .search-field {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .search-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-search {
+            background: #667eea;
+            color: white;
+        }
+        .btn-search:hover {
+            background: #5a67d8;
+        }
+        .rules-list {
+            margin-bottom: 20px;
+        }
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .rule-item span {
+            flex: 1;
+        }
+        .rule-item .rule-field {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .rule-item .rule-operator {
+            color: #666;
+            font-size: 13px;
+        }
+        .rule-item .rule-value {
+            font-weight: 600;
+            color: #333;
+        }
+        .add-rule-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .add-rule-form select,
+        .add-rule-form input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .add-rule-form select {
+            min-width: 140px;
+        }
+        .add-rule-form input {
+            width: 120px;
+        }
+        .no-rules {
+            color: #999;
+            font-style: italic;
+            padding: 15px;
+            text-align: center;
+        }
+
+        /* Toast提示样式 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            min-width: 200px;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.warning { background: #ffc107; color: #333; }
+        .toast.info { background: #17a2b8; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .toast.hiding {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        /* 加载遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 复选框样式 */
+        .row-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* 公告列表样式 */
+        .announcement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .announcement-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .announcement-item.inactive {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .announcement-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        .announcement-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .announcement-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .announcement-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .announcement-content {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+        .announcement-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            gap: 20px;
+        }
+        .announcement-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-move {
+            padding: 4px 12px;
+            background: #f5f5f5;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #666;
+            transition: all .2s;
+        }
+        .btn-move:hover {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        .announcement-form textarea {
+            width: 100%;
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .selection-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #667eea;
+            color: #fff;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+            transition: all 0.2s ease;
+        }
+        .selection-badge:empty {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="admin-container">
+        <a href="home.html" class="back-btn">← 返回主页</a>
+        <h1 class="page-title">管理后台</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('internship')">实习报告数据</button>
+            <button class="tab" onclick="switchTab('registration')">实习情况登记数据</button>
+            <button class="tab" onclick="switchTab('supervision')">实习监管信息数据</button>
+            <button class="tab" onclick="switchTab('users')">用户数据</button>
+            <button class="tab" onclick="switchTab('batch')">批次管理</button>
+            <button class="tab" onclick="switchTab('announcement')">系统公告</button>
+            <button class="tab" onclick="switchTab('settings')">系统配置</button>
+        </div>
+
+        <!-- 实习报告数据 -->
+        <div id="internship-tab" class="tab-content active">
+            <div class="search-box advanced-search">
+                <div class="search-row">
+                    <input type="text" id="internshipSearch" placeholder="搜索任意字段..." class="search-field" onkeyup="searchData('internship')">
+                    <input type="text" id="internshipSearchCollege" placeholder="学院" class="search-field">
+                    <input type="text" id="internshipSearchMajor" placeholder="专业" class="search-field">
+                    <input type="text" id="internshipSearchCompany" placeholder="实习单位" class="search-field">
+                </div>
+                <div class="search-row">
+                    <select id="internshipSearchBatch" class="search-field">
+                        <option value="">批次</option>
+                        <option value="无">无</option>
+                    </select>
+                    <button class="btn btn-search" onclick="searchInternshipAdvanced()">筛选</button>
+                    <button class="btn btn-reset" onclick="resetInternshipSearch()">重置</button>
+                </div>
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="openModal('internship')">+ 添加数据</button>
+                <button class="btn btn-edit" onclick="batchInvertSelection('internship')">反选</button>
+                <button class="btn btn-edit" onclick="batchExport('internship')">批量导出</button>
+                <button class="btn btn-delete" onclick="batchDelete('internship')">批量删除</button>
+                <span class="selection-badge" id="internshipSelectionCount"></span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="internshipSelectAll" class="row-checkbox" onclick="toggleSelectAll('internship')"></th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>批次</th>
+                        <th>学院</th>
+                        <th>专业</th>
+                        <th>班级</th>
+                        <th>实习单位</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="internshipTable">
+                </tbody>
+            </table>
+            <div class="pagination" id="internshipPagination">
+                <button onclick="changePage('internship', -1)" id="internshipPrev">上一页</button>
+                <span class="page-info" id="internshipPageInfo">第 1 页 / 共 1 页 (共 0 条)</span>
+                <button onclick="changePage('internship', 1)" id="internshipNext">下一页</button>
+                <span class="page-size-control">
+                    每页<input type="number" id="internshipPageSize" value="50" min="10" max="200" onchange="changePageSize('internship', this.value)">条
+                </span>
+            </div>
+        </div>
+
+        <!-- 实习情况登记数据 -->
+        <div id="registration-tab" class="tab-content">
+            <div class="search-box advanced-search">
+                <div class="search-row">
+                    <input type="text" id="registrationSearch" placeholder="搜索任意字段..." class="search-field" onkeyup="searchData('registration')">
+                    <input type="text" id="registrationSearchCollege" placeholder="学院" class="search-field">
+                    <input type="text" id="registrationSearchMajor" placeholder="专业" class="search-field">
+                    <input type="text" id="registrationSearchCompany" placeholder="实习单位" class="search-field">
+                </div>
+                <div class="search-row">
+                    <select id="registrationSearchBatch" class="search-field">
+                        <option value="">批次</option>
+                        <option value="无">无</option>
+                    </select>
+                    <button class="btn btn-search" onclick="searchRegistrationAdvanced()">筛选</button>
+                    <button class="btn btn-reset" onclick="resetRegistrationSearch()">重置</button>
+                </div>
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="openModal('registration')">+ 添加数据</button>
+                <button class="btn btn-edit" onclick="batchInvertSelection('registration')">反选</button>
+                <button class="btn btn-edit" onclick="batchExport('registration')">批量导出</button>
+                <button class="btn btn-delete" onclick="batchDelete('registration')">批量删除</button>
+                <span class="selection-badge" id="registrationSelectionCount"></span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="registrationSelectAll" class="row-checkbox" onclick="toggleSelectAll('registration')"></th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>批次</th>
+                        <th>学院</th>
+                        <th>专业</th>
+                        <th>班级</th>
+                        <th>实习单位</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="registrationTable">
+                </tbody>
+            </table>
+            <div class="pagination" id="registrationPagination">
+                <button onclick="changePage('registration', -1)" id="registrationPrev">上一页</button>
+                <span class="page-info" id="registrationPageInfo">第 1 页 / 共 1 页 (共 0 条)</span>
+                <button onclick="changePage('registration', 1)" id="registrationNext">下一页</button>
+                <span class="page-size-control">
+                    每页<input type="number" id="registrationPageSize" value="50" min="10" max="200" onchange="changePageSize('registration', this.value)">条
+                </span>
+            </div>
+        </div>
+
+        <!-- 实习监管信息数据 -->
+        <div id="supervision-tab" class="tab-content">
+            <div class="search-box advanced-search">
+                <div class="search-row">
+                    <input type="text" id="supervisionSearch" placeholder="搜索任意字段..." class="search-field" onkeyup="searchData('supervision')">
+                    <input type="text" id="supervisionSearchCollege" placeholder="学院" class="search-field">
+                    <input type="text" id="supervisionSearchCompany" placeholder="实习单位" class="search-field">
+                </div>
+                <div class="search-row">
+                    <select id="supervisionSearchBatch" class="search-field">
+                        <option value="">批次</option>
+                        <option value="无">无</option>
+                    </select>
+                    <button class="btn btn-search" onclick="searchSupervisionAdvanced()">筛选</button>
+                    <button class="btn btn-reset" onclick="resetSupervisionSearch()">重置</button>
+                </div>
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="openModal('supervision')">+ 添加数据</button>
+                <button class="btn btn-edit" onclick="batchInvertSelection('supervision')">反选</button>
+                <button class="btn btn-edit" onclick="batchExport('supervision')">批量导出</button>
+                <button class="btn btn-delete" onclick="batchDelete('supervision')">批量删除</button>
+                <span class="selection-badge" id="supervisionSelectionCount"></span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="supervisionSelectAll" class="row-checkbox" onclick="toggleSelectAll('supervision')"></th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>批次</th>
+                        <th>学院</th>
+                        <th>专业</th>
+                        <th>班级</th>
+                        <th>实习单位</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="supervisionTable">
+                </tbody>
+            </table>
+            <div class="pagination" id="supervisionPagination">
+                <button onclick="changePage('supervision', -1)" id="supervisionPrev">上一页</button>
+                <span class="page-info" id="supervisionPageInfo">第 1 页 / 共 1 页 (共 0 条)</span>
+                <button onclick="changePage('supervision', 1)" id="supervisionNext">下一页</button>
+                <span class="page-size-control">
+                    每页<input type="number" id="supervisionPageSize" value="50" min="10" max="200" onchange="changePageSize('supervision', this.value)">条
+                </span>
+            </div>
+        </div>
+
+        <!-- 用户数据 -->
+        <div id="users-tab" class="tab-content">
+            <div class="search-box advanced-search">
+                <div class="search-row">
+                    <input type="text" id="usersSearchStudentId" placeholder="学号" class="search-field">
+                    <input type="text" id="usersSearchName" placeholder="姓名" class="search-field">
+                    <select id="usersSearchGender" class="search-field">
+                        <option value="">性别</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                    <input type="text" id="usersSearchCollege" placeholder="学院" class="search-field">
+                </div>
+                <div class="search-row">
+                    <input type="text" id="usersSearchMajor" placeholder="专业" class="search-field">
+                    <select id="usersSearchClassNumber" class="search-field">
+                        <option value="">班级</option>
+                        <option value="01">01班</option>
+                        <option value="02">02班</option>
+                        <option value="03">03班</option>
+                        <option value="04">04班</option>
+                        <option value="05">05班</option>
+                    </select>
+                    <select id="usersSearchBatch" class="search-field">
+                        <option value="">批次</option>
+                        <option value="无">无</option>
+                    </select>
+                    <button class="btn btn-search" onclick="searchUsers()">搜索</button>
+                    <button class="btn btn-reset" onclick="resetUserSearch()">重置</button>
+                </div>
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="openModal('users')">+ 添加数据</button>
+                <button class="btn btn-edit" onclick="openImportModal()">批量导入学生</button>
+                <button class="btn btn-edit" onclick="batchInvertSelection('users')">反选</button>
+                <button class="btn btn-reset" onclick="batchResetPassword('users')">批量重置密码</button>
+                <button class="btn btn-delete" onclick="batchDelete('users')">批量删除</button>
+                <span class="selection-badge" id="usersSelectionCount"></span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="usersSelectAll" class="row-checkbox" onclick="toggleSelectAll('users')"></th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>性别</th>
+                        <th>学院</th>
+                        <th>专业</th>
+                        <th>班级</th>
+                        <th>批次</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable">
+                </tbody>
+            </table>
+            <div class="pagination" id="usersPagination">
+                <button onclick="changePage('users', -1)" id="usersPrev">上一页</button>
+                <span class="page-info" id="usersPageInfo">第 1 页 / 共 1 页 (共 0 条)</span>
+                <button onclick="changePage('users', 1)" id="usersNext">下一页</button>
+                <span class="page-size-control">
+                    每页<input type="number" id="usersPageSize" value="50" min="10" max="200" onchange="changePageSize('users', this.value)">条
+                </span>
+            </div>
+        </div>
+
+        <!-- 批次管理 -->
+        <div id="batch-tab" class="tab-content">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;">
+                <strong>说明:</strong>为不同批次的学生设置提交截止时间。特殊批次"无"表示不受时间限制。<br>
+                <strong style="color: #d32f2f;">注意:批次名称不能为"无",这是系统保留值。</strong>
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="openBatchModal()">+ 添加批次</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>批次名称</th>
+                        <th>截止时间</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="batchTable">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 系统公告管理 -->
+        <div id="announcement-tab" class="tab-content">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;">
+                <strong>说明:</strong>公告将显示在主页左侧公告区域。可设置停用和启用以控制可见性,点击上移/下移调整顺序。
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="openAnnouncementModal()">+ 发布公告</button>
+            </div>
+            <div id="announcementList" class="announcement-list">
+                <!-- 公告列表将在这里动态生成 -->
+            </div>
+        </div>
+
+        <!-- 系统配置 -->
+        <div id="settings-tab" class="tab-content">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;">
+                <strong>说明:</strong>修改以下配置后,所有学生的实习信息填写页面将自动使用新的默认值。
+            </div>
+            <div class="action-buttons" style="margin-bottom: 15px;">
+                <button class="btn btn-add" onclick="saveSettings()">保存配置</button>
+            </div>
+            <div id="settingsForm" style="max-width: 600px;">
+                <div class="form-group">
+                    <label>课程名称</label>
+                    <input type="text" id="setting-courseName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>课程代码</label>
+                    <input type="text" id="setting-courseCode" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>学分</label>
+                    <input type="text" id="setting-credits" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>实习类型</label>
+                    <input type="text" id="setting-internshipType" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>实习组织形式</label>
+                    <input type="text" id="setting-internshipOrgForm" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>实习方式</label>
+                    <input type="text" id="setting-internshipMethod" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>学年</label>
+                    <input type="text" id="setting-academicYear" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>校级及以上实习基地</label>
+                    <select id="setting-isSchoolBase" class="form-control">
+                        <option value="否">否</option>
+                        <option value="是">是</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>数智赋能实习基地</label>
+                    <select id="setting-isDigitalBase" class="form-control">
+                        <option value="否">否</option>
+                        <option value="是">是</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>海外实习基地</label>
+                    <select id="setting-isOverseasBase" class="form-control">
+                        <option value="否">否</option>
+                        <option value="是">是</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">编辑记录</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="editForm">
+                <div id="formFields"></div>
+                <button type="submit" class="btn btn-save">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量导入模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">批量导入学生</h2>
+                <span class="close-btn" onclick="closeImportModal()">&times;</span>
+            </div>
+            <form id="importForm" onsubmit="submitImport(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">选择批次</label>
+                    <select id="importBatch" required
+                            style="padding: 10px; border: 1px solid #d9d9d9; border-radius: 6px; width: 100%; font-size: 14px;">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">选择学生名单文件</label>
+                    <input type="file" id="importFile" accept=".xlsx,.xls" required
+                           style="padding: 10px; border: 1px solid #d9d9d9; border-radius: 6px; width: 100%;">
+                </div>
+                <div style="background: #f6ffed; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; color: #389e0d;">
+                    <strong>Excel 文件格式要求(.xlsx/.xls):</strong><br>
+                    • 第一行为标题行(学号、姓名、性别、班级),数据从第二行开始<br>
+                    • 学院默认为"医学部"<br>
+                    • 专业会自动从班级中提取(如:2023生物医学工程(创新班)01 → 专业:生物医学工程(创新班))<br>
+                    • 班级序号会自动从班级中提取(如:2023生物医学工程(创新班)01 → 班级序号:01)<br><br>
+                    系统会根据学号自动去重
+                </div>
+                <div id="importResult" style="margin-bottom: 15px; display: none;"></div>
+                <button type="submit" class="btn btn-save">开始导入</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 公告编辑模态框 -->
+    <div id="announcementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="announcementModalTitle">发布公告</h2>
+                <span class="close-btn" onclick="closeAnnouncementModal()">&times;</span>
+            </div>
+            <form id="announcementForm" class="announcement-form" onsubmit="submitAnnouncement(event)">
+                <input type="hidden" id="announcementId">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">公告标题</label>
+                    <input type="text" id="announcementTitle" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                        placeholder="请输入公告标题">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">公告内容</label>
+                    <textarea id="announcementContent" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                        placeholder="请输入公告内容"></textarea>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="announcementActive" checked>
+                        <span>立即发布</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-save">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批次编辑模态框 -->
+    <div id="batchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="batchModalTitle">添加批次</h2>
+                <span class="close-btn" onclick="closeBatchModal()">&times;</span>
+            </div>
+            <form id="batchForm" onsubmit="submitBatch(event)">
+                <input type="hidden" id="batchId">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">批次名称</label>
+                    <input type="text" id="batchName" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                        placeholder="例如:2024-1">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">截止时间</label>
+                    <input type="datetime-local" id="batchDeadline" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                </div>
+                <button type="submit" class="btn btn-save">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'internship';
+        let currentId = null;
+        let paginationState = {
+            internship: { page: 1, totalPages: 1, total: 0 },
+            registration: { page: 1, totalPages: 1, total: 0 },
+            supervision: { page: 1, totalPages: 1, total: 0 },
+            users: { page: 1, totalPages: 1, total: 0 }
+        };
+        // 每页显示条数(动态可配置)
+        let ITEMS_PER_PAGE = 50;
+        let csrfToken = '';
+
+        // 获取CSRF Token
+        async function fetchCsrfToken() {
+            try {
+                const response = await fetch('/api/csrf-token');
+                const result = await response.json();
+                csrfToken = result.csrf_token;
+            } catch (error) {
+                console.error('获取CSRF Token失败:', error);
+            }
+        }
+
+        // 获取请求头(包含CSRF Token)
+        function getRequestHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            };
+        }
+
+        // 检查管理员权限
+        async function checkAdmin() {
+            try {
+                const response = await fetch('/api/check-login');
+                const result = await response.json();
+
+                if (!result.isLoggedIn || result.user?.role !== 'admin') {
+                    showToast('无权访问', 'error');
+                    window.location.href = '/home.html';
+                    return;
+                }
+
+                // 获取CSRF Token(失败不影响页面加载)
+                try {
+                    await fetchCsrfToken();
+                } catch (e) {
+                    console.error('获取CSRF Token失败:', e);
+                }
+
+                // 加载数据
+                await loadData('internship');
+                await loadBatchOptions();
+                await loadBatchOptions();
+            } catch (error) {
+                console.error('检查权限失败:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 切换标签
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+            if (tab === 'announcement') {
+                loadAnnouncements();
+            } else if (tab === 'batch') {
+                loadBatches(); // 加载批次列表
+            } else if (tab === 'settings') {
+                loadSettings();
+            } else {
+                loadData(tab);
+            }
+            // 加载批次选项到筛选下拉框
+            if (tab === 'internship' || tab === 'registration' || tab === 'users') {
+                loadBatchOptions();
+            }
+        }
+
+        // 加载批次选项到筛选下拉框
+        async function loadBatchOptions() {
+            try {
+                const response = await fetch('/api/batches');
+                const batches = await response.json();
+
+                // 缓存批次列表供用户编辑弹窗使用
+                window._batchNames = ['无'].concat(batches.map(b => b.name));
+
+                // 更新实习报告批次筛选
+                const internshipSelect = document.getElementById('internshipSearchBatch');
+                if (internshipSelect) {
+                    internshipSelect.innerHTML = '<option value="">批次</option><option value="无">无</option>';
+                    batches.forEach(batch => {
+                        const option = document.createElement('option');
+                        option.value = batch.name;
+                        option.textContent = batch.name;
+                        internshipSelect.appendChild(option);
+                    });
+                }
+
+                // 更新登记表批次筛选
+                const registrationSelect = document.getElementById('registrationSearchBatch');
+                if (registrationSelect) {
+                    registrationSelect.innerHTML = '<option value="">批次</option><option value="无">无</option>';
+                    batches.forEach(batch => {
+                        const option = document.createElement('option');
+                        option.value = batch.name;
+                        option.textContent = batch.name;
+                        registrationSelect.appendChild(option);
+                    });
+                }
+
+                // 更新用户数据批次筛选
+                const usersSelect = document.getElementById('usersSearchBatch');
+                if (usersSelect) {
+                    usersSelect.innerHTML = '<option value="">批次</option><option value="无">无</option>';
+                    batches.forEach(batch => {
+                        const option = document.createElement('option');
+                        option.value = batch.name;
+                        option.textContent = batch.name;
+                        usersSelect.appendChild(option);
+                    });
+                }
+
+                // 更新监管信息批次筛选
+                const supervisionSelect = document.getElementById('supervisionSearchBatch');
+                if (supervisionSelect) {
+                    supervisionSelect.innerHTML = '<option value="">批次</option><option value="无">无</option>';
+                    batches.forEach(batch => {
+                        const option = document.createElement('option');
+                        option.value = batch.name;
+                        option.textContent = batch.name;
+                        supervisionSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('加载批次选项失败:', error);
+            }
+        }
+
+        // 加载数据
+        async function loadData(type, page = 1) {
+            try {
+                let url = `/api/admin/${type}?page=${page}&per_page=${ITEMS_PER_PAGE}`;
+
+                // 根据类型添加相应的搜索参数
+                if (type === 'internship') {
+                    const keyword = document.getElementById('internshipSearch')?.value.trim() || '';
+                    const college = document.getElementById('internshipSearchCollege')?.value.trim() || '';
+                    const major = document.getElementById('internshipSearchMajor')?.value.trim() || '';
+                    const company = document.getElementById('internshipSearchCompany')?.value.trim() || '';
+                    const batch = document.getElementById('internshipSearchBatch')?.value || '';
+
+                    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+                    if (college) url += `&college=${encodeURIComponent(college)}`;
+                    if (major) url += `&major=${encodeURIComponent(major)}`;
+                    if (company) url += `&company=${encodeURIComponent(company)}`;
+                    if (batch) url += `&batch=${encodeURIComponent(batch)}`;
+                } else if (type === 'registration') {
+                    const keyword = document.getElementById('registrationSearch')?.value.trim() || '';
+                    const college = document.getElementById('registrationSearchCollege')?.value.trim() || '';
+                    const major = document.getElementById('registrationSearchMajor')?.value.trim() || '';
+                    const company = document.getElementById('registrationSearchCompany')?.value.trim() || '';
+                    const batch = document.getElementById('registrationSearchBatch')?.value || '';
+
+                    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+                    if (college) url += `&college=${encodeURIComponent(college)}`;
+                    if (major) url += `&major=${encodeURIComponent(major)}`;
+                    if (company) url += `&company=${encodeURIComponent(company)}`;
+                    if (batch) url += `&batch=${encodeURIComponent(batch)}`;
+                } else if (type === 'supervision') {
+                    const keyword = document.getElementById('supervisionSearch')?.value.trim() || '';
+                    const college = document.getElementById('supervisionSearchCollege')?.value.trim() || '';
+                    const company = document.getElementById('supervisionSearchCompany')?.value.trim() || '';
+                    const batch = document.getElementById('supervisionSearchBatch')?.value || '';
+
+                    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+                    if (college) url += `&college=${encodeURIComponent(college)}`;
+                    if (company) url += `&company=${encodeURIComponent(company)}`;
+                    if (batch) url += `&batch=${encodeURIComponent(batch)}`;
+                } else if (type === 'users') {
+                    const studentId = document.getElementById('usersSearchStudentId')?.value.trim() || '';
+                    const name = document.getElementById('usersSearchName')?.value.trim() || '';
+                    const gender = document.getElementById('usersSearchGender')?.value || '';
+                    const college = document.getElementById('usersSearchCollege')?.value.trim() || '';
+                    const major = document.getElementById('usersSearchMajor')?.value.trim() || '';
+                    const classNumber = document.getElementById('usersSearchClassNumber')?.value || '';
+                    const batch = document.getElementById('usersSearchBatch')?.value || '';
+
+                    if (studentId) url += `&studentId=${encodeURIComponent(studentId)}`;
+                    if (name) url += `&name=${encodeURIComponent(name)}`;
+                    if (gender) url += `&gender=${encodeURIComponent(gender)}`;
+                    if (college) url += `&college=${encodeURIComponent(college)}`;
+                    if (major) url += `&major=${encodeURIComponent(major)}`;
+                    if (classNumber) url += `&classNumber=${encodeURIComponent(classNumber)}`;
+                    if (batch) url += `&batch=${encodeURIComponent(batch)}`;
+                }
+
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                paginationState[type].page = result.page;
+                paginationState[type].totalPages = result.total_pages;
+                paginationState[type].total = result.total;
+
+                renderTable(type, result.data);
+                updatePagination(type);
+            } catch (error) {
+                console.error('Load data error:', error);
+                showToast('加载数据失败: ' + error.message, 'error');
+                // 显示空数据
+                renderTable(type, []);
+            }
+        }
+
+        // 更新分页控件
+        function updatePagination(type) {
+            const state = paginationState[type];
+            const prevBtn = document.getElementById(type + 'Prev');
+            const nextBtn = document.getElementById(type + 'Next');
+            const pageInfo = document.getElementById(type + 'PageInfo');
+
+            prevBtn.disabled = state.page <= 1;
+            nextBtn.disabled = state.page >= state.totalPages;
+            pageInfo.textContent = `第 ${state.page} 页 / 共 ${state.totalPages} 页 (共 ${state.total} 条)`;
+        }
+
+        // 切换页面
+        function changePage(type, delta) {
+            const newPage = paginationState[type].page + delta;
+            if (newPage >= 1 && newPage <= paginationState[type].totalPages) {
+                loadData(type, newPage);
+            }
+        }
+
+        // 修改每页显示条数
+        function changePageSize(type, newSize) {
+            // 验证输入范围
+            let size = parseInt(newSize);
+            if (isNaN(size) || size < 10) {
+                size = 10;
+            } else if (size > 200) {
+                size = 200;
+            }
+
+            // 更新全局每页条数
+            ITEMS_PER_PAGE = size;
+
+            // 同步更新所有四个表格的输入框
+            const types = ['internship', 'registration', 'supervision', 'users'];
+            types.forEach(t => {
+                const input = document.getElementById(t + 'PageSize');
+                if (input && input.value != size) {
+                    input.value = size;
+                }
+            });
+
+            // 重置到第一页并重新加载数据
+            paginationState[type].page = 1;
+            loadData(type, 1);
+
+            showToast(`每页显示条数已设置为 ${size} 条`, 'success');
+        }
+
+        // HTML转义函数,防止XSS攻击
+	        function escapeHtml(text) {
+	            if (text === null || text === undefined) {
+	                return '';
+	            }
+	            const div = document.createElement('div');
+	            div.textContent = String(text);
+	            return div.innerHTML;
+	        }
+
+        // 格式化时间:2026-06-11 21:34
+        function formatTime(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            const pad = n => String(n).padStart(2, '0');
+            return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) +
+                   ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        }
+
+        // ISO 时间转为 datetime-local 输入框所需格式:2026-06-30T23:59
+        function toDatetimeLocal(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return '';
+            const pad = n => String(n).padStart(2, '0');
+            return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) +
+                   'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        }
+
+	        // 渲染表格
+        function renderTable(type, data) {
+            const tbody = document.getElementById(type + 'Table');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                const row = document.createElement('tr');
+                let colspan;
+                if (type === 'users') {
+                    colspan = 9;  // 复选框 + 8列
+                } else if (type === 'internship' || type === 'registration' || type === 'supervision') {
+                    colspan = 9;  // 复选框 + 8个数据列
+                } else {
+                    colspan = 9;
+                }
+                row.innerHTML = `<td colspan="${colspan}" style="text-align: center; color: #999;">暂无数据</td>`;
+                tbody.appendChild(row);
+                return;
+            }
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                if (type === 'internship' || type === 'registration' || type === 'supervision') {
+                    // 统一格式:学号、姓名、批次、学院、专业、班级、实习单位、操作
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="row-checkbox" data-id="${escapeHtml(item.studentId)}" data-type="${type}"></td>
+                        <td>${escapeHtml(item.studentId)}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(item.batch || '无')}</td>
+                        <td>${escapeHtml(item.college)}</td>
+                        <td>${escapeHtml(item.major || '-')}</td>
+                        <td>${escapeHtml(item.classNumber || '-')}</td>
+                        <td>${escapeHtml(item.company)}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-edit" onclick="editRecord('${type}', '${escapeHtml(item.studentId)}')">编辑</button>
+                                <button class="btn btn-export" onclick="exportRecord('${type}', '${escapeHtml(item.studentId)}')">导出</button>
+                                <button class="btn btn-delete" onclick="deleteRecord('${type}', '${escapeHtml(item.studentId)}')">删除</button>
+                            </div>
+                        </td>
+                    `;
+                } else if (type === 'users') {
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="row-checkbox" data-id="${escapeHtml(item.studentId)}" data-type="users"></td>
+                        <td>${escapeHtml(item.studentId)}</td>
+                        <td>${escapeHtml(item.name) || '-'}</td>
+                        <td>${escapeHtml(item.gender) || '-'}</td>
+                        <td>${escapeHtml(item.college) || '-'}</td>
+                        <td>${escapeHtml(item.major) || '-'}</td>
+                        <td>${escapeHtml(item.classNumber) || '-'}</td>
+                        <td>${escapeHtml(item.batch) || '无'}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-edit" onclick="editRecord('users', '${escapeHtml(item.studentId)}')">编辑</button>
+                                <button class="btn btn-reset" onclick="resetPassword('${escapeHtml(item.studentId)}')">重置密码</button>
+                                <button class="btn btn-delete" onclick="deleteRecord('users', '${escapeHtml(item.studentId)}')">删除</button>
+                            </div>
+                        </td>
+                    `;
+                }
+
+                tbody.appendChild(row);
+            });
+
+            // 为行复选框添加事件监听(所有表格)
+            if (type === 'internship' || type === 'registration' || type === 'supervision' || type === 'users') {
+                attachRowCheckboxListeners(type);
+
+                // 根据全局变量恢复勾选状态
+                const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+                let checkedCount = 0;
+                checkboxes.forEach(cb => {
+                    if (selectedIds[type].has(cb.dataset.id)) {
+                        cb.checked = true;
+                        checkedCount++;
+                    }
+                });
+
+                // 更新表头状态
+                const selectAllCheckbox = document.getElementById(type + 'SelectAll');
+                if (checkedCount === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (checkedCount === checkboxes.length) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                }
+
+                updateSelectionCount(type);
+            }
+        }
+
+        // 搜索数据(从后端搜索)
+        function searchData(type) {
+            // 重置到第一页并搜索(搜索条件由 loadData 自动从输入框读取)
+            loadData(type, 1);
+        }
+
+        // 用户高级搜索
+        function searchUsers() {
+            // 使用统一的 loadData 函数,搜索条件自动从输入框读取
+            loadData('users', 1);
+        }
+
+        // 重置用户搜索
+        function resetUserSearch() {
+            document.getElementById('usersSearchStudentId').value = '';
+            document.getElementById('usersSearchName').value = '';
+            document.getElementById('usersSearchGender').value = '';
+            document.getElementById('usersSearchCollege').value = '';
+            document.getElementById('usersSearchMajor').value = '';
+            document.getElementById('usersSearchClassNumber').value = '';
+            document.getElementById('usersSearchBatch').value = '';
+            // 重新加载所有数据
+            loadData('users', 1, '');
+        }
+
+        // ==================== 实习报告高级筛选 ====================
+        async function searchInternshipAdvanced() {
+            const params = new URLSearchParams();
+            params.append('page', '1');
+            params.append('per_page', ITEMS_PER_PAGE);
+
+            const keyword = document.getElementById('internshipSearch').value.trim();
+            const college = document.getElementById('internshipSearchCollege').value.trim();
+            const major = document.getElementById('internshipSearchMajor').value.trim();
+            const company = document.getElementById('internshipSearchCompany').value.trim();
+            const batch = document.getElementById('internshipSearchBatch').value;
+
+            if (keyword) params.append('keyword', keyword);
+            if (college) params.append('college', college);
+            if (major) params.append('major', major);
+            if (company) params.append('company', company);
+            if (batch) params.append('batch', batch);
+
+            try {
+                const response = await fetch(`/api/admin/internship?${params.toString()}`);
+                const result = await response.json();
+
+                paginationState.internship.page = result.page;
+                paginationState.internship.totalPages = result.total_pages;
+                paginationState.internship.total = result.total;
+                renderTable('internship', result.data);
+                updatePagination('internship');
+                showToast('筛选完成', 'success');
+            } catch (error) {
+                console.error('筛选实习报告失败:', error);
+                showToast('筛选失败,请重试', 'error');
+            }
+        }
+
+        function resetInternshipSearch() {
+            document.getElementById('internshipSearch').value = '';
+            document.getElementById('internshipSearchCollege').value = '';
+            document.getElementById('internshipSearchMajor').value = '';
+            document.getElementById('internshipSearchCompany').value = '';
+            document.getElementById('internshipSearchBatch').value = '';
+            loadData('internship', 1, '');
+        }
+
+        // ==================== 登记表高级筛选 ====================
+        async function searchRegistrationAdvanced() {
+            const params = new URLSearchParams();
+            params.append('page', '1');
+            params.append('per_page', ITEMS_PER_PAGE);
+
+            const keyword = document.getElementById('registrationSearch').value.trim();
+            const college = document.getElementById('registrationSearchCollege').value.trim();
+            const major = document.getElementById('registrationSearchMajor').value.trim();
+            const company = document.getElementById('registrationSearchCompany').value.trim();
+            const batch = document.getElementById('registrationSearchBatch').value;
+
+            if (keyword) params.append('keyword', keyword);
+            if (college) params.append('college', college);
+            if (major) params.append('major', major);
+            if (company) params.append('company', company);
+            if (batch) params.append('batch', batch);
+
+            try {
+                const response = await fetch(`/api/admin/registration?${params.toString()}`);
+                const result = await response.json();
+
+                paginationState.registration.page = result.page;
+                paginationState.registration.totalPages = result.total_pages;
+                paginationState.registration.total = result.total;
+                renderTable('registration', result.data);
+                updatePagination('registration');
+                showToast('筛选完成', 'success');
+            } catch (error) {
+                console.error('筛选登记表失败:', error);
+                showToast('筛选失败,请重试', 'error');
+            }
+        }
+
+        function resetRegistrationSearch() {
+            document.getElementById('registrationSearch').value = '';
+            document.getElementById('registrationSearchCollege').value = '';
+            document.getElementById('registrationSearchMajor').value = '';
+            document.getElementById('registrationSearchCompany').value = '';
+            document.getElementById('registrationSearchBatch').value = '';
+            loadData('registration', 1, '');
+        }
+
+        // 实习监管信息高级筛选
+        async function searchSupervisionAdvanced() {
+            const params = new URLSearchParams();
+            params.append('page', '1');
+            params.append('per_page', ITEMS_PER_PAGE);
+
+            const keyword = document.getElementById('supervisionSearch').value.trim();
+            const college = document.getElementById('supervisionSearchCollege').value.trim();
+            const company = document.getElementById('supervisionSearchCompany').value.trim();
+            const batch = document.getElementById('supervisionSearchBatch').value;
+
+            if (keyword) params.append('keyword', keyword);
+            if (college) params.append('college', college);
+            if (company) params.append('company', company);
+            if (batch) params.append('batch', batch);
+
+            try {
+                const response = await fetch(`/api/admin/supervision?${params.toString()}`);
+                const result = await response.json();
+
+                paginationState.supervision.page = result.page;
+                paginationState.supervision.totalPages = result.total_pages;
+                paginationState.supervision.total = result.total;
+                renderTable('supervision', result.data);
+                updatePagination('supervision');
+                showToast('筛选完成', 'success');
+            } catch (error) {
+                console.error('筛选监管信息失败:', error);
+                showToast('筛选失败,请重试', 'error');
+            }
+        }
+
+        function resetSupervisionSearch() {
+            document.getElementById('supervisionSearch').value = '';
+            document.getElementById('supervisionSearchCollege').value = '';
+            document.getElementById('supervisionSearchCompany').value = '';
+            document.getElementById('supervisionSearchBatch').value = '';
+            loadData('supervision', 1, '');
+        }
+
+        // ==================== 批量选择功能(简化版)====================
+        // 全局变量:存储所有勾选的ID
+        const selectedIds = {
+            internship: new Set(),
+            registration: new Set(),
+            supervision: new Set(),
+            users: new Set()
+        };
+
+        // 更新勾选数量显示
+        function updateSelectionCount(type) {
+            const badge = document.getElementById(type + 'SelectionCount');
+            if (!badge) return;
+            const count = selectedIds[type].size;
+            if (count > 0) {
+                badge.textContent = '\u2713 \u5df2\u9009 ' + count + ' \u6761';
+                badge.style.display = 'inline-block';
+            } else {
+                badge.textContent = '';
+                badge.style.display = 'none';
+            }
+        }
+
+        // 更新表头复选框状态
+        function updateSelectAllState(type) {
+            const selectAllCheckbox = document.getElementById(type + 'SelectAll');
+            const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+            const checkedCount = document.querySelectorAll(`#${type}Table .row-checkbox:checked`).length;
+            const totalCount = checkboxes.length;
+
+            if (checkedCount === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCount === totalCount) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+
+            updateSelectionCount(type);
+        }
+
+        // 为行复选框添加事件监听
+        function attachRowCheckboxListeners(type) {
+            const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    if (cb.checked) {
+                        selectedIds[type].add(cb.dataset.id);
+                    } else {
+                        selectedIds[type].delete(cb.dataset.id);
+                    }
+                    updateSelectAllState(type);
+                });
+            });
+        }
+
+        // 表头复选框点击处理
+        async function toggleSelectAll(type) {
+            const selectAllCheckbox = document.getElementById(type + 'SelectAll');
+
+            if (selectAllCheckbox.checked) {
+                // 全选所有(跨页)
+                await batchSelectAllFiltered(type);
+            } else {
+                // 取消全选 - 清空所有已选ID
+                selectedIds[type].clear();
+                // 取消当前页的勾选
+                const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+                checkboxes.forEach(cb => cb.checked = false);
+                updateSelectionCount(type);
+            }
+        }
+
+        // 全选所有(跨页,基于当前筛选条件)
+        async function batchSelectAllFiltered(type) {
+            showLoading();
+            try {
+                // 构建查询参数(使用当前的筛选条件)
+                const params = new URLSearchParams();
+
+                if (type === 'internship') {
+                    const keyword = document.getElementById('internshipSearch').value.trim();
+                    const college = document.getElementById('internshipSearchCollege').value.trim();
+                    const major = document.getElementById('internshipSearchMajor').value.trim();
+                    const company = document.getElementById('internshipSearchCompany').value.trim();
+                    const batch = document.getElementById('internshipSearchBatch').value;
+
+                    if (keyword) params.append('keyword', keyword);
+                    if (college) params.append('college', college);
+                    if (major) params.append('major', major);
+                    if (company) params.append('company', company);
+                    if (batch) params.append('batch', batch);
+                } else if (type === 'registration') {
+                    const keyword = document.getElementById('registrationSearch').value.trim();
+                    const college = document.getElementById('registrationSearchCollege').value.trim();
+                    const major = document.getElementById('registrationSearchMajor').value.trim();
+                    const company = document.getElementById('registrationSearchCompany').value.trim();
+                    const batch = document.getElementById('registrationSearchBatch').value;
+
+                    if (keyword) params.append('keyword', keyword);
+                    if (college) params.append('college', college);
+                    if (major) params.append('major', major);
+                    if (company) params.append('company', company);
+                    if (batch) params.append('batch', batch);
+                } else if (type === 'supervision') {
+                    const keyword = document.getElementById('supervisionSearch').value.trim();
+                    const college = document.getElementById('supervisionSearchCollege').value.trim();
+                    const company = document.getElementById('supervisionSearchCompany').value.trim();
+                    const batch = document.getElementById('supervisionSearchBatch').value;
+
+                    if (keyword) params.append('keyword', keyword);
+                    if (college) params.append('college', college);
+                    if (company) params.append('company', company);
+                    if (batch) params.append('batch', batch);
+                } else if (type === 'users') {
+                    const studentId = document.getElementById('usersSearchStudentId').value.trim();
+                    const name = document.getElementById('usersSearchName').value.trim();
+                    const gender = document.getElementById('usersSearchGender').value;
+                    const college = document.getElementById('usersSearchCollege').value.trim();
+                    const major = document.getElementById('usersSearchMajor').value.trim();
+                    const classNumber = document.getElementById('usersSearchClassNumber').value;
+                    const batch = document.getElementById('usersSearchBatch').value;
+
+                    if (studentId) params.append('studentId', studentId);
+                    if (name) params.append('name', name);
+                    if (gender) params.append('gender', gender);
+                    if (college) params.append('college', college);
+                    if (major) params.append('major', major);
+                    if (classNumber) params.append('classNumber', classNumber);
+                    if (batch) params.append('batch', batch);
+                }
+
+                params.append('all_ids', '1');
+                const response = await fetch(`/api/admin/${type}?${params.toString()}`, {
+                    headers: {
+                        'X-CSRF-Token': csrfToken
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('获取数据失败');
+                }
+
+                const data = await response.json();
+                const allIds = data.ids || [];
+
+                if (allIds.length === 0) {
+                    showToast('没有符合条件的记录', 'warning');
+                    hideLoading();
+                    return;
+                }
+
+                // 把所有ID加入全局变量
+                allIds.forEach(id => selectedIds[type].add(id));
+
+                // 选中当前页的所有复选框
+                const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+                checkboxes.forEach(cb => {
+                    cb.checked = true;
+                });
+
+                // 更新表头状态
+                const selectAllCheckbox = document.getElementById(type + 'SelectAll');
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+
+                updateSelectionCount(type);
+
+                showToast('已全选所有 ' + allIds.length + ' 条记录', 'success');
+            } catch (error) {
+                console.error('全选所有失败:', error);
+                showToast('全选所有失败', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 反选 - 针对所有已选中的记录(跨页)
+        async function batchInvertSelection(type) {
+            // 获取当前筛选条件下的所有记录ID
+            showLoading();
+            try {
+                const params = new URLSearchParams();
+
+                if (type === 'internship') {
+                    const keyword = document.getElementById('internshipSearch').value.trim();
+                    const college = document.getElementById('internshipSearchCollege').value.trim();
+                    const major = document.getElementById('internshipSearchMajor').value.trim();
+                    const company = document.getElementById('internshipSearchCompany').value.trim();
+                    const batch = document.getElementById('internshipSearchBatch').value;
+
+                    if (keyword) params.append('keyword', keyword);
+                    if (college) params.append('college', college);
+                    if (major) params.append('major', major);
+                    if (company) params.append('company', company);
+                    if (batch) params.append('batch', batch);
+                } else if (type === 'registration') {
+                    const keyword = document.getElementById('registrationSearch').value.trim();
+                    const college = document.getElementById('registrationSearchCollege').value.trim();
+                    const major = document.getElementById('registrationSearchMajor').value.trim();
+                    const company = document.getElementById('registrationSearchCompany').value.trim();
+                    const batch = document.getElementById('registrationSearchBatch').value;
+
+                    if (keyword) params.append('keyword', keyword);
+                    if (college) params.append('college', college);
+                    if (major) params.append('major', major);
+                    if (company) params.append('company', company);
+                    if (batch) params.append('batch', batch);
+                } else if (type === 'supervision') {
+                    const keyword = document.getElementById('supervisionSearch').value.trim();
+                    const college = document.getElementById('supervisionSearchCollege').value.trim();
+                    const company = document.getElementById('supervisionSearchCompany').value.trim();
+                    const batch = document.getElementById('supervisionSearchBatch').value;
+
+                    if (keyword) params.append('keyword', keyword);
+                    if (college) params.append('college', college);
+                    if (company) params.append('company', company);
+                    if (batch) params.append('batch', batch);
+                } else if (type === 'users') {
+                    // 用户数据的搜索条件
+                    const studentId = document.getElementById('usersSearchStudentId').value.trim();
+                    const name = document.getElementById('usersSearchName').value.trim();
+                    const gender = document.getElementById('usersSearchGender').value;
+                    const college = document.getElementById('usersSearchCollege').value.trim();
+                    const major = document.getElementById('usersSearchMajor').value.trim();
+                    const classNumber = document.getElementById('usersSearchClassNumber').value;
+                    const batch = document.getElementById('usersSearchBatch').value;
+
+                    if (studentId) params.append('studentId', studentId);
+                    if (name) params.append('name', name);
+                    if (gender) params.append('gender', gender);
+                    if (college) params.append('college', college);
+                    if (major) params.append('major', major);
+                    if (classNumber) params.append('classNumber', classNumber);
+                    if (batch) params.append('batch', batch);
+                }
+
+                params.append('all_ids', '1');
+                const response = await fetch(`/api/admin/${type}?${params.toString()}`, {
+                    headers: {
+                        'X-CSRF-Token': csrfToken
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('获取数据失败');
+                }
+
+                const data = await response.json();
+                const allIds = data.ids || [];
+
+                if (allIds.length === 0) {
+                    showToast('没有符合条件的记录', 'warning');
+                    hideLoading();
+                    return;
+                }
+
+                // 反选逻辑:已选的取消,未选的加入
+                allIds.forEach(id => {
+                    if (selectedIds[type].has(id)) {
+                        selectedIds[type].delete(id);
+                    } else {
+                        selectedIds[type].add(id);
+                    }
+                });
+
+                // 刷新当前页显示
+                const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+                checkboxes.forEach(cb => {
+                    cb.checked = selectedIds[type].has(cb.dataset.id);
+                });
+
+                updateSelectAllState(type);
+                showToast('已反选', 'success');
+            } catch (error) {
+                console.error('反选失败:', error);
+                showToast('反选失败', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 获取选中的ID列表
+        function getSelectedIds(type) {
+            return Array.from(selectedIds[type]);
+        }
+
+        // ==================== 批量删除功能 ====================
+        async function batchDelete(type) {
+            const ids = getSelectedIds(type);
+            if (ids.length === 0) {
+                showToast('请先选择要删除的记录', 'warning');
+                return;
+            }
+
+            if (!confirm(`确定要删除选中的 ${ids.length} 条记录吗?此操作不可恢复!`)) {
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`/api/admin/${type}/batch-delete`, {
+                    method: 'POST',
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify({ ids: ids })
+                });
+
+                if (response.ok) {
+                    showToast(`成功删除 ${ids.length} 条记录`, 'success');
+                    // 清除已删除的ID
+                    ids.forEach(id => selectedIds[type].delete(id));
+                    updateSelectionCount(type);
+                    loadData(type);
+                } else {
+                    const error = await response.json();
+                    showToast(error.error || '删除失败', 'error');
+                }
+            } catch (error) {
+                console.error('批量删除失败:', error);
+                showToast('删除失败,请重试', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 批量重置密码
+        async function batchResetPassword(type) {
+            const ids = getSelectedIds(type);
+            if (ids.length === 0) {
+                showToast('请先选择要重置密码的用户', 'warning');
+                return;
+            }
+
+            if (!confirm(`确定要重置选中的 ${ids.length} 个用户的密码为学号吗?`)) {
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`/api/admin/${type}/batch-reset-password`, {
+                    method: 'POST',
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify({ student_ids: ids })
+                });
+
+                if (response.ok) {
+                    showToast(`成功重置 ${ids.length} 个用户的密码`, 'success');
+                    // 清除已处理的ID
+                    ids.forEach(id => selectedIds[type].delete(id));
+                    updateSelectionCount(type);
+                    loadData(type);
+                } else {
+                    showToast('重置密码失败', 'error');
+                }
+            } catch (error) {
+                console.error('批量重置密码失败:', error);
+                showToast('重置密码失败,请重试', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 更新批量操作按钮显示
+        function updateBatchActions(type) {
+            const checkboxes = document.querySelectorAll(`#${type}Table .row-checkbox`);
+            const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+            // 更新全局变量
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedIds[type].add(cb.dataset.id);
+                } else {
+                    selectedIds[type].delete(cb.dataset.id);
+                }
+            });
+
+            // 更新UI
+            updateSelectionCount(type);
+        }
+
+        // 打开模态框
+        async function openModal(type, id = null) {
+            currentTab = type;
+            currentId = id;
+
+            const modal = document.getElementById('editModal');
+            const title = document.getElementById('modalTitle');
+            const formFields = document.getElementById('formFields');
+
+            title.textContent = id ? '编辑数据' : '添加数据';
+            formFields.innerHTML = '';
+
+            let fields = [];
+
+            if (type === 'internship') {
+                fields = [
+                    {name: 'studentId', label: '学号', type: 'text'},
+                    {name: 'name', label: '姓名', type: 'text'},
+                    {name: 'college', label: '学院', type: 'text'},
+                    {name: 'major', label: '专业', type: 'text'},
+                    {name: 'teacher', label: '指导教师', type: 'text'},
+                    {name: 'company', label: '实习单位', type: 'text'},
+                    {name: 'startDate', label: '开始日期', type: 'date'},
+                    {name: 'endDate', label: '结束日期', type: 'date'},
+                    {name: 'totalDays', label: '实习天数', type: 'number'},
+                    {name: 'submitDate', label: '提交日期', type: 'date'},
+                    {name: 'internshipContent', label: '实习内容', type: 'textarea'},
+                    {name: 'experience', label: '体会和收获', type: 'textarea'},
+                    {name: 'suggestions', label: '建议', type: 'textarea'}
+                ];
+            } else if (type === 'registration') {
+                fields = [
+                    {name: 'studentId', label: '学号', type: 'text'},
+                    {name: 'name', label: '姓名', type: 'text'},
+                    {name: 'gender', label: '性别', type: 'text'},
+                    {name: 'college', label: '学院', type: 'text'},
+                    {name: 'major', label: '专业', type: 'text'},
+                    {name: 'company', label: '实习单位', type: 'text'},
+                    {name: 'startDate', label: '开始日期', type: 'date'},
+                    {name: 'endDate', label: '结束日期', type: 'date'},
+                    {name: 'totalDays', label: '实习天数', type: 'number'},
+                    {name: 'selfEvaluation', label: '自我鉴定', type: 'textarea'}
+                ];
+            } else if (type === 'supervision') {
+                fields = [
+                    {name: 'studentId', label: '学号', type: 'text'},
+                    {name: 'name', label: '姓名', type: 'text'},
+                    {name: 'enrollmentYear', label: '入学年份', type: 'text'},
+                    {name: 'college', label: '学院', type: 'text'},
+                    {name: 'classNumber', label: '班级', type: 'text'},
+                    {name: 'teacher', label: '校内指导老师', type: 'text'},
+                    {name: 'company', label: '实习单位', type: 'text'},
+                    {name: 'companyCreditCode', label: '统一社会信用代码', type: 'text'},
+                    {name: 'internshipAreaCode', label: '实习地区及代码', type: 'text'},
+                    {name: 'internshipAddress', label: '实习详细地址', type: 'text'},
+                    {name: 'hasLiabilityInsurance', label: '是否有实习责任险', type: 'select', options: ['是', '否']},
+                    {name: 'hasAccidentInsurance', label: '是否有人身意外险', type: 'select', options: ['是', '否']},
+                    {name: 'hasSafetyTraining', label: '是否进行安全教育', type: 'select', options: ['是', '否']},
+                    {name: 'hasTripartiteAgreement', label: '是否签订三方协议', type: 'select', options: ['是', '否']},
+                    {name: 'companyAcquisitionMethod', label: '单位获取方式', type: 'select', options: ['学校组织联系', '学生自行联系', '其他']},
+                    {name: 'hasEmergencyPlan', label: '是否有应急预案', type: 'select', options: ['是', '否']},
+                    {name: 'startDate', label: '开始日期', type: 'date'},
+                    {name: 'endDate', label: '结束日期', type: 'date'},
+                    {name: 'totalDays', label: '实习天数', type: 'number'},
+                    {name: 'internshipPosition', label: '实习岗位', type: 'text'},
+                    {name: 'internshipSalary', label: '实习报酬', type: 'text'},
+                    {name: 'companySupervisor', label: '企业指导人员', type: 'text'}
+                ];
+            } else if (type === 'users') {
+                fields = [
+                    {name: 'studentId', label: '学号', type: 'text'},
+                    {name: 'name', label: '姓名', type: 'text'},
+                    {name: 'gender', label: '性别', type: 'text'},
+                    {name: 'college', label: '学院', type: 'text'},
+                    {name: 'major', label: '专业', type: 'text'},
+                    {name: 'classNumber', label: '班级', type: 'select', options: ['01', '02', '03', '04', '05']},
+                    {name: 'batch', label: '批次', type: 'select', options: ['无']},
+                    {name: 'role', label: '角色', type: 'select', options: ['student', 'admin']}
+                ];
+            }
+
+            // 用户 tab:把批次选项扩展为缓存的所有批次
+            if (type === 'users' && window._batchNames) {
+                var batchField = fields.find(function(f) { return f.name === 'batch'; });
+                if (batchField) batchField.options = window._batchNames;
+            }
+
+            // 如果是编辑,加载数据
+            if (id) {
+                try {
+                    const response = await fetch(`/api/admin/${type}/${id}`);
+                    const data = await response.json();
+
+                    fields.forEach(field => {
+                        // API 返回 snake_case,表单字段是 camelCase,尝试多种键名
+                        const snakeKey = field.name.replace(/([A-Z])/g, '_$1').toLowerCase();
+                        let value = '';
+                        if (data[snakeKey] !== undefined) {
+                            value = data[snakeKey];
+                        } else if (data[field.name] !== undefined) {
+                            value = data[field.name];
+                        } else if (field.name === 'studentId' && data.student !== undefined) {
+                            // student FK 在 API 中输出为 student(值是学号)
+                            value = data.student;
+                        }
+                        addFormField(formFields, field, value);
+                    });
+                } catch (error) {
+                    console.error('Load record error:', error);
+                }
+            } else {
+                fields.forEach(field => {
+                    addFormField(formFields, field, '');
+                });
+            }
+
+            modal.style.display = 'block';
+        }
+
+        // 添加表单字段
+        function addFormField(container, field, value) {
+            const div = document.createElement('div');
+            div.className = 'form-group';
+
+            // 表单字段名统一用 snake_case(和后端序列化器一致)
+            var snakeName = field.name.replace(/([A-Z])/g, '_$1').toLowerCase();
+            // 所有字段标星号表示必填
+            var labelHtml = field.label + ' <span class="required-star">*</span>';
+
+            if (field.type === 'textarea') {
+                div.innerHTML = `
+                    <label>${labelHtml}</label>
+                    <textarea name="${snakeName}" rows="4">${value}</textarea>
+                `;
+            } else if (field.type === 'select') {
+                const options = field.options.map(opt => {
+                    let label = opt;
+                    if (field.name === 'role') {
+                        label = opt === 'student' ? '学生' : '管理员';
+                    }
+                    return `<option value="${opt}" ${value === opt ? 'selected' : ''}>${label}</option>`;
+                }).join('');
+                div.innerHTML = `
+                    <label>${labelHtml}</label>
+                    <select name="${snakeName}">${options}</select>
+                `;
+            } else {
+                var extraAttrs = '';
+                if (field.name === 'studentId' && currentId) {
+                    extraAttrs += ' readonly';
+                }
+                if (field.name === 'studentId' && !currentId) {
+                    extraAttrs += ' required placeholder="请输入学号"';
+                }
+                // 清理值：date 类型不接受 null 或带时间的 ISO 字符串
+                var cleanValue = value;
+                if (field.type === 'date') {
+                    if (!cleanValue || cleanValue === 'null') {
+                        cleanValue = '';
+                    } else if (cleanValue.length > 10) {
+                        cleanValue = cleanValue.substring(0, 10);
+                    }
+                } else if (field.type === 'number') {
+                    if (cleanValue === null || cleanValue === 'null') {
+                        cleanValue = '';
+                    }
+                }
+                div.innerHTML = `
+                    <label>${labelHtml}</label>
+                    <input type="${field.type}" name="${snakeName}" value="${cleanValue}"${extraAttrs}>
+                `;
+            }
+
+            container.appendChild(div);
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // ==================== 批量导入功能 ====================
+
+        async function openImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+            document.getElementById('importResult').style.display = 'none';
+            document.getElementById('importForm').reset();
+
+            // 加载批次列表
+            const batchSelect = document.getElementById('importBatch');
+            batchSelect.innerHTML = '<option value="">加载中...</option>';
+
+            try {
+                const response = await fetch('/api/batches');
+                const batches = await response.json();
+
+                batchSelect.innerHTML = '<option value="">请选择批次</option>';
+
+                // 添加"无"选项
+                const noneOption = document.createElement('option');
+                noneOption.value = '无';
+                noneOption.textContent = '无';
+                batchSelect.appendChild(noneOption);
+
+                // 添加批次选项
+                batches.forEach(batch => {
+                    const option = document.createElement('option');
+                    option.value = batch.name;
+                    option.textContent = `${batch.name} (截止: ${batch.deadline})`;
+                    batchSelect.appendChild(option);
+                });
+
+                // 默认选择"无"
+                batchSelect.value = '无';
+            } catch (error) {
+                console.error('加载批次列表失败:', error);
+                batchSelect.innerHTML = '<option value="">加载失败</option>';
+            }
+        }
+
+        // ==================== 公告管理功能 ====================
+
+        async function loadAnnouncements() {
+            try {
+                const response = await fetch('/api/announcements');
+                const announcements = await response.json();
+                renderAnnouncements(announcements);
+            } catch (error) {
+                console.error('加载公告失败:', error);
+                showToast('加载公告失败', 'error');
+            }
+        }
+
+        function renderAnnouncements(announcements) {
+            const container = document.getElementById('announcementList');
+            if (announcements.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无公告</div>';
+                return;
+            }
+
+            container.innerHTML = announcements.map(function(a) {
+                var safeTitle = escapeHtml(a.title).replace(/['"\\]/g, '').replace(/\n/g, ' ');
+                var itemClass = a.is_active ? '' : 'inactive';
+                var statusText = a.is_active ? '已发布' : '已停用';
+                var toggleVal = a.is_active ? 0 : 1;
+                var toggleText = a.is_active ? '停用' : '启用';
+                return '<div class="announcement-item ' + itemClass + '">' +
+                    '<div class="announcement-header">' +
+                        '<div class="announcement-title">' + escapeHtml(a.title) + '</div>' +
+                        '<span class="announcement-status ' + (a.is_active ? 'active' : 'inactive') + '">' + statusText + '</span>' +
+                    '</div>' +
+                    '<div class="announcement-content">' + escapeHtml(a.content).replace(/\n/g, '<br>') + '</div>' +
+                    '<div class="announcement-meta">' +
+                        '<span>创建时间: ' + formatTime(a.created_at) + '</span>' +
+                        '<span>更新时间: ' + formatTime(a.updated_at) + '</span>' +
+                    '</div>' +
+                    '<div class="announcement-actions">' +
+                        '<button class="btn btn-move" onclick="moveAnnouncement(' + a.id + ', -1)" title="上移">上移</button>' +
+                        '<button class="btn btn-move" onclick="moveAnnouncement(' + a.id + ', 1)" title="下移">下移</button>' +
+                        '<button class="btn btn-edit" data-id="' + a.id + '" data-content="' + escapeHtml(a.content).replace(/"/g, '&quot;') + '" onclick="editAnnouncement(this, ' + a.id + ',\'' + safeTitle + '\',' + a.is_active + ')">编辑</button>' +
+                        '<button class="btn btn-edit" onclick="toggleAnnouncementStatus(' + a.id + ',' + toggleVal + ')">' + toggleText + '</button>' +
+                        '<button class="btn btn-delete" onclick="deleteAnnouncement(' + a.id + ')">删除</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function openAnnouncementModal() {
+            document.getElementById('announcementModal').style.display = 'block';
+            document.getElementById('announcementModalTitle').textContent = '发布公告';
+            document.getElementById('announcementForm').reset();
+            document.getElementById('announcementId').value = '';
+        }
+
+        function closeAnnouncementModal() {
+            document.getElementById('announcementModal').style.display = 'none';
+        }
+
+        function editAnnouncement(btn, id, title, isActive) {
+            document.getElementById('announcementModal').style.display = 'block';
+            document.getElementById('announcementModalTitle').textContent = '编辑公告';
+            document.getElementById('announcementId').value = id;
+            document.getElementById('announcementTitle').value = title;
+            document.getElementById('announcementContent').value = btn.dataset.content;
+            document.getElementById('announcementActive').checked = isActive;
+        }
+
+        async function submitAnnouncement(e) {
+            e.preventDefault();
+            const id = document.getElementById('announcementId').value;
+            const data = {
+                title: document.getElementById('announcementTitle').value,
+                content: document.getElementById('announcementContent').value,
+                is_active: document.getElementById('announcementActive').checked ? 1 : 0
+            };
+
+            showLoading();
+            try {
+                const url = id ? `/api/announcements/${id}` : '/api/announcements';
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showToast(id ? '公告更新成功' : '公告发布成功', 'success');
+                    closeAnnouncementModal();
+                    loadAnnouncements();
+                } else {
+                    const result = await response.json();
+                    showToast(result.error || '操作失败', 'error');
+                }
+            } catch (error) {
+                console.error('保存公告失败:', error);
+                showToast('保存失败,请重试', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function toggleAnnouncementStatus(id, isActive) {
+            try {
+                const response = await fetch(`/api/announcements/${id}`, {
+                    method: 'PUT',
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify({ is_active: isActive })
+                });
+
+                if (response.ok) {
+                    showToast(isActive ? '公告已启用' : '公告已停用', 'success');
+                    loadAnnouncements();
+                } else {
+                    showToast('操作失败', 'error');
+                }
+            } catch (error) {
+                console.error('切换公告状态失败:', error);
+                showToast('操作失败', 'error');
+            }
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('确定要删除这条公告吗?此操作不可恢复!')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/announcements/${id}`, {
+                    method: 'DELETE',
+                    headers: getRequestHeaders()
+                });
+
+                if (response.ok) {
+                    showToast('公告已删除', 'success');
+                    loadAnnouncements();
+                } else {
+                    showToast('删除失败', 'error');
+                }
+            } catch (error) {
+                console.error('删除公告失败:', error);
+                showToast('删除失败', 'error');
+            }
+        }
+
+        // 公告上下移动
+        async function moveAnnouncement(id, direction) {
+            const url = direction === -1 ? `/api/announcements/${id}/move-up` : `/api/announcements/${id}/move-down`;
+            showLoading();
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: getRequestHeaders()
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showToast(result.message || '移动成功', 'success');
+                    loadAnnouncements();
+                } else {
+                    showToast(result.message || '移动失败', 'warning');
+                }
+            } catch (error) {
+                showToast('移动失败', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ==================== 批次管理功能 ====================
+        async function loadBatches() {
+            try {
+                const response = await fetch('/api/batches');
+                const batches = await response.json();
+                renderBatches(batches);
+            } catch (error) {
+                console.error('加载批次列表失败:', error);
+                showToast('加载批次列表失败', 'error');
+            }
+        }
+
+        function renderBatches(batches) {
+            const tbody = document.getElementById('batchTable');
+            tbody.innerHTML = '';
+
+            if (batches.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="5" style="text-align: center; color: #999;">暂无批次数据</td>';
+                tbody.appendChild(row);
+                return;
+            }
+
+            batches.forEach(batch => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${escapeHtml(batch.name)}</td>
+                    <td>${formatTime(batch.deadline)}</td>
+                    <td>${formatTime(batch.created_at)}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-edit" onclick='editBatch(${batch.id},"${escapeHtml(batch.name)}","${batch.deadline}")'>编辑</button>
+                            <button class="btn btn-delete" onclick="deleteBatch(${batch.id})">删除</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openBatchModal() {
+            document.getElementById('batchId').value = '';
+            document.getElementById('batchName').value = '';
+            document.getElementById('batchDeadline').value = '';
+            document.getElementById('batchModalTitle').textContent = '添加批次';
+            document.getElementById('batchModal').style.display = 'block';
+        }
+
+        function closeBatchModal() {
+            document.getElementById('batchModal').style.display = 'none';
+        }
+
+        function editBatch(id, batch, deadline) {
+            document.getElementById('batchId').value = id;
+            document.getElementById('batchName').value = batch;
+            document.getElementById('batchDeadline').value = toDatetimeLocal(deadline);
+            document.getElementById('batchModalTitle').textContent = '编辑批次';
+            document.getElementById('batchModal').style.display = 'block';
+        }
+
+        async function submitBatch(e) {
+            e.preventDefault();
+            const id = document.getElementById('batchId').value;
+            const data = {
+                name: document.getElementById('batchName').value,
+                deadline: document.getElementById('batchDeadline').value
+            };
+
+            showLoading();
+            try {
+                const url = id ? `/api/batches/${id}` : '/api/batches';
+                const method = id ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    // serializer.errors 可能是 dict,取第一条信息
+                    var msg = '';
+                    if (typeof err.message === 'string') {
+                        msg = err.message;
+                    } else if (typeof err.message === 'object') {
+                        for (var k in err.message) {
+                            msg = err.message[k];
+                            if (Array.isArray(msg)) msg = msg[0];
+                            break;
+                        }
+                    }
+                    throw new Error(msg || err.error || '保存失败');
+                }
+
+                closeBatchModal();
+                await loadBatches();
+                showToast(id ? '批次更新成功' : '批次创建成功', 'success');
+            } catch (error) {
+                console.error('保存批次失败:', error);
+                showToast(error.message || '保存失败', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteBatch(id) {
+            if (!confirm('确定要删除这个批次吗?此操作不可恢复!')) {
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`/api/batches/${id}`, {
+                    method: 'DELETE',
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify({ csrf_token: csrfToken })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '删除失败');
+                }
+
+                await loadBatches();
+                showToast('批次删除成功', 'success');
+            } catch (error) {
+                console.error('删除批次失败:', error);
+                showToast(error.message || '删除失败', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+        }
+
+        // 显示加载动画
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        // 隐藏加载动画
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // ==================== Toast提示功能 ====================
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            // 图标
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'i'
+            };
+
+            toast.innerHTML = `<span>${icons[type] || 'i'}</span><span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+
+            // 自动移除
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            }, duration);
+        }
+
+        async function submitImport(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('importFile');
+            const batchSelect = document.getElementById('importBatch');
+            const resultDiv = document.getElementById('importResult');
+            const file = fileInput.files[0];
+            const batch = batchSelect.value;
+
+            if (!file) {
+                showToast('请选择文件', 'warning');
+                return;
+            }
+
+            if (!batch) {
+                showToast('请选择批次', 'warning');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('batch', batch);
+
+            // 显示加载动画
+            showLoading();
+
+            try {
+                const response = await fetch('/api/admin/import-students', {
+                    method: 'POST',
+                    headers: {'X-CSRF-Token': csrfToken},
+                    body: formData
+                });
+
+                const result = await response.json();
+                resultDiv.style.display = 'block';
+
+                if (response.ok && result.success) {
+                    resultDiv.innerHTML = `
+                        <div style="background: #f6ffed; padding: 12px; border-radius: 6px; color: #389e0d;">
+                            <strong>导入成功!</strong><br>
+                            成功导入:${result.imported} 人<br>
+                            跳过重复:${result.skipped} 人<br>
+                            导入失败:${result.failed} 人
+                        </div>
+                    `;
+                    loadData('users');
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="background: #fff2f0; padding: 12px; border-radius: 6px; color: #cf1322;">
+                            <strong>导入失败:</strong>${result.error || '未知错误'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div style="background: #fff2f0; padding: 12px; border-radius: 6px; color: #cf1322;">
+                        <strong>导入失败:</strong>${error.message}
+                    </div>
+                `;
+            } finally {
+                // 隐藏加载动画
+                hideLoading();
+            }
+        }
+
+        // ==================== 重置所有密码功能 ====================
+
+        async function resetAllPasswords() {
+            if (!confirm('确定要将所有非管理员用户的密码重置为学号吗?\n\n此操作不可撤销!')) {
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/api/admin/reset-all-passwords', {
+                    method: 'POST',
+                    headers: getRequestHeaders()
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(result.message, 'success');
+                } else {
+                    showToast('重置失败:' + (result.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showToast('重置失败:' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ==================== 批量导出功能 ====================
+
+        async function batchExport(type) {
+            // 只导出选中的记录
+            let studentIds = getSelectedIds(type);
+
+            // 如果没有选中任何记录,提示用户先选择
+            if (studentIds.length === 0) {
+                showToast('请先选择要导出的记录', 'warning');
+                return;
+            }
+
+            if (!confirm(`确定要导出 ${studentIds.length} 条记录吗?`)) {
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`/api/admin/batch-export/${type}`, {
+                    method: 'POST',
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify({studentIds})
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    // 优先从 Content-Disposition 取文件名
+                    const cd = response.headers.get('Content-Disposition');
+                    if (cd) {
+                        const m = cd.match(/filename\*=(?:utf-8|UTF-8)''(.+?)(?:;|$)/);
+                        if (m) {
+                            a.download = decodeURIComponent(m[1]);
+                        } else {
+                            const m2 = cd.match(/filename="?([^";]+)"?(?:;|$)/);
+                            if (m2) a.download = m2[1];
+                        }
+                    }
+                    // 回退:按类型生成默认文件名
+                    if (!a.download) {
+                        const now = new Date();
+                        const ts = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}`;
+                        if (type === 'supervision') {
+                            a.download = `${ts}_批量导出${studentIds.length}条_实习监管信息表.xlsx`;
+                        } else {
+                            const label = type === 'internship' ? '实习报告' : '实习情况登记表';
+                            a.download = `${ts}_批量导出${studentIds.length}条_${label}.zip`;
+                        }
+                    }
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showToast(`成功导出 ${studentIds.length} 条记录`, 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.error || '导出失败', 'error');
+                }
+            } catch (error) {
+                console.error('Batch export error:', error);
+                showToast('导出失败:' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 编辑记录
+        function editRecord(type, id) {
+            openModal(type, id);
+        }
+
+        // 删除记录
+        async function deleteRecord(type, id) {
+            if (!confirm('确定要删除这条记录吗?')) return;
+
+            try {
+                const response = await fetch(`/api/admin/${type}/${id}`, {
+                    method: 'DELETE',
+                    headers: getRequestHeaders()
+                });
+
+                if (response.ok) {
+                    loadData(type);
+                } else {
+                    showToast('删除失败', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+            }
+        }
+
+        // 重置密码
+        async function resetPassword(studentId) {
+            if (!confirm(`确定要将 ${studentId} 的密码重置为学号吗?`)) return;
+
+            try {
+                const response = await fetch(`/api/admin/users/${studentId}/reset-password`, {
+                    method: 'POST',
+                    headers: getRequestHeaders()
+                });
+
+                if (response.ok) {
+                    showToast('密码重置成功', 'success');
+                } else {
+                    showToast('密码重置失败', 'error');
+                }
+            } catch (error) {
+                console.error('Reset password error:', error);
+            }
+        }
+
+        // 导出记录
+        async function exportRecord(type, id) {
+            console.log('Export called:', { type, id });
+            let url;
+            if (type === 'internship') {
+                url = `/api/download/${id}`;
+            } else if (type === 'registration') {
+                url = `/api/download-registration/${id}`;
+            } else if (type === 'supervision') {
+                url = `/api/admin/supervision/${id}/export`;
+            } else {
+                showToast('该类型不支持导出', 'warning');
+                return;
+            }
+
+            // 用 fetch 请求,成功则下载,失败则提示
+            try {
+                const response = await fetch(url, { method: 'GET' });
+                if (!response.ok) {
+                    try {
+                        const errData = await response.json();
+                        showToast(errData.message || errData.error || '无记录可下载', 'error');
+                    } catch(e) {
+                        showToast('无记录可下载', 'warning');
+                    }
+                    return;
+                }
+
+                // 获取 blob 并触发下载
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                // 从 Content-Disposition 中提取文件名
+                var filename = id + '.docx';
+                var cd = response.headers.get('Content-Disposition');
+                if (cd) {
+                    var match = cd.match(/filename\*?=(?:UTF-8'')?([^;]+)/i);
+                    if (match) {
+                        filename = decodeURIComponent(match[1].trim());
+                    }
+                }
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(link);
+            } catch(e) {
+                // 降级:直接打开
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // 表单提交
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const rawData = {};
+            formData.forEach((value, key) => {
+                rawData[key] = value;
+            });
+
+            // 表单字段名已经是 snake_case(和后端序列化器一致),直接提交
+            const data = rawData;
+
+            // 前端校验:新建时学号必填
+            if (!currentId) {
+                if (!data.student_id || data.student_id.trim() === '') {
+                    showToast('请填写学号', 'warning');
+                    return;
+                }
+            }
+
+            try {
+                const url = currentId
+                    ? `/api/admin/${currentTab}/${currentId}`
+                    : `/api/admin/${currentTab}`;
+                const method = currentId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    loadData(currentTab);
+                } else {
+                    try {
+                        const errData = await response.json();
+                        var errMsg = '';
+                        if (typeof errData.message === 'string') {
+                            errMsg = errData.message;
+                        } else if (typeof errData.message === 'object') {
+                            errMsg = JSON.stringify(errData.message);
+                        } else if (errData.error) {
+                            errMsg = errData.error;
+                        } else {
+                            errMsg = '保存失败';
+                        }
+                        showToast(errMsg, 'error');
+                    } catch(e) {
+                        showToast('保存失败', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+            }
+        });
+
+        // 运算符映射
+        const operatorMap = {
+            'eq': '等于',
+            'gt': '大于',
+            'lt': '小于',
+            'ne': '不等于',
+            'ge': '不小于(>=)',
+            'le': '不大于(<=)'
+        };
+
+        // 字段映射
+        // 加载系统配置
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/admin/settings');
+                const settings = await response.json();
+                document.getElementById('setting-courseName').value = settings.courseName || '';
+                document.getElementById('setting-courseCode').value = settings.courseCode || '';
+                document.getElementById('setting-credits').value = settings.credits || '';
+                document.getElementById('setting-internshipType').value = settings.internshipType || '';
+                document.getElementById('setting-internshipOrgForm').value = settings.internshipOrgForm || '';
+                document.getElementById('setting-internshipMethod').value = settings.internshipMethod || '';
+                document.getElementById('setting-academicYear').value = settings.academicYear || '';
+                document.getElementById('setting-isSchoolBase').value = settings.isSchoolBase || '';
+                document.getElementById('setting-isDigitalBase').value = settings.isDigitalBase || '';
+                document.getElementById('setting-isOverseasBase').value = settings.isOverseasBase || '';
+            } catch (error) {
+                console.error('加载系统配置失败:', error);
+                showToast('加载系统配置失败', 'error');
+            }
+        }
+
+        // 保存系统配置
+        async function saveSettings() {
+            const data = {
+                courseName: document.getElementById('setting-courseName').value,
+                courseCode: document.getElementById('setting-courseCode').value,
+                credits: document.getElementById('setting-credits').value,
+                internshipType: document.getElementById('setting-internshipType').value,
+                internshipOrgForm: document.getElementById('setting-internshipOrgForm').value,
+                internshipMethod: document.getElementById('setting-internshipMethod').value,
+                academicYear: document.getElementById('setting-academicYear').value,
+                isSchoolBase: document.getElementById('setting-isSchoolBase').value,
+                isDigitalBase: document.getElementById('setting-isDigitalBase').value,
+                isOverseasBase: document.getElementById('setting-isOverseasBase').value
+            };
+
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    method: 'PUT',
+                    headers: getRequestHeaders(),
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('配置已保存成功!', 'success');
+                } else {
+                    showToast('保存失败:' + (result.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                console.error('保存系统配置失败:', error);
+                showToast('保存系统配置失败', 'error');
+            }
+        }
+
+        // 初始化
+        checkAdmin();
+    </script>
+</body>
+</html>
